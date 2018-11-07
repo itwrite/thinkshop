@@ -1,0 +1,1009 @@
+{extend name="base" /}
+{block name="center"}
+
+<script type="text/javascript" src="/assets/js/md5.js"></script>
+<script>
+    var pass = hex_md5("123456");
+    var pass2 = "{:md5('123456')}";
+    console.log(pass,pass2);
+</script>
+<style>
+
+    table[bordered] {
+        width: auto;
+    }
+
+    table[bordered] th{
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-top: 1px solid #ddd;
+        font-weight: bold;
+        text-align: center;
+        vertical-align: middle;
+    }
+    table[bordered] td {
+        border: 1px solid #ddd;
+        min-width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        padding: 5px;
+    }
+
+    table[bordered] tr > td:last-child, table[bordered] tr > th:last-child {
+        width: auto !important;
+    }
+    table[bordered] tr>td:not(:last-child),table[bordered] tr>th:not(:last-child){
+        border-right:0;
+    }
+    table[bordered] tr:not(:first-child)>td{
+        border-top:0;
+    }
+
+    .container{
+        width: auto !important;
+    }
+    .hide {
+        display: none;
+    }
+
+    .l-text {
+        width: auto;
+    }
+
+    .l-text-field {
+        height: 18px;
+        line-height: 18px;
+    }
+
+    .iInput{
+        position: absolute;
+        width: 140px;
+        height: 18px;
+        left: 1px;
+        top: 2px;
+        border:0;
+    }
+    .l-form .l-fieldcontainer{
+        margin-top: 6px;
+    }
+    /** ================================================================================= */
+
+    /*#sku-result>table{*/
+        /*margin-left: 42px;*/
+        /*margin-right: 0;*/
+    /*}*/
+    #sku-result>table th,#do_all>table th{
+        background-color: #EDEDED;
+        border: 1px solid #D7D7D7;
+        height: 25px;
+        text-align: center;
+        vertical-align: middle;
+    }
+    #do_all td input {
+        width: 90%;
+        border: 0;
+    }
+    /** ================================================================================= */
+    .sku-custom-box tr>td:nth-child(2)>span{
+        background: #FAFAFA;
+        padding: 5px 10px;
+    }
+    .sku-custom-box tr>td:nth-child(2)>span:not(:last-child){
+        margin-right: 10px;
+    }
+
+    .sku-table .table>thead>tr>th{
+        padding: 3px;
+        text-align: center;
+    }
+
+    /*** ============================================================= ***/
+
+
+    a.l-checkbox {
+        margin-right: 0;
+    }
+
+    .clearfix {
+        clear: both;
+    }
+
+    .clearfix:after {
+        content: " ";
+        clear: both;
+        display: block;
+    }
+</style>
+
+<div class="row pb10 pt10">
+    <a href="{:url('shop/product/add1')}">
+        <span class="glyphicon glyphicon-arrow-left"></span> 返回
+    </a>
+</div>
+
+<form id="release-form" class="form-horizontal" method="post"
+      enctype="multipart/form-data">
+
+    <div id="form2" class="l-form" ligeruiid="form2">
+        <div class="l-form-container">
+
+            <ul>
+                <li class="l-fieldcontainer l-fieldcontainer-first">
+                    <ul>
+                        <li style="width:90px;text-align:left;">商品分类：</li>
+                        <li id="form2|2" style="width:170px;text-align:left;background: #efefef;padding: 0 8px;">
+                            <input type="hidden" id="category_id" name="category_id" value="{$category.category_id}">
+                            {$category.category_name}
+                        </li>
+                    </ul>
+                </li>
+
+            </ul>
+            <ul>
+                <li class="l-fieldcontainer l-fieldcontainer-first" fieldindex="1">
+                    <ul>
+                        <li style="width:90px;text-align:left;">产品名称：</li>
+                        <li id="form2|1" style="text-align:left;">
+                            <div class="l-text" style="width: 268px;">
+                                <input type="text" name="prop[product_name]" class="l-text-field" required="required" style="width: 264px;">
+                            </div>
+                        </li>
+                        <li style="width:40px;"></li>
+                    </ul>
+                </li>
+
+            </ul>
+            <div class="l-group l-group-hasicon"><img
+                    src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/skins/icons/communication.gif"><span>商品属性</span>
+
+                <!--<div class="togglebtn hide"></div>-->
+            </div>
+            <div id="attributes-container">
+                <ul>
+                    <li class="l-fieldcontainer">
+                        <ul>
+                            <li style="width:90px;text-align:right;">品牌：</li>
+                            <li style="width:170px;text-align:left;position: relative;">
+                                <div style="position:relative;">
+                                    <select name="prop[brand_id]" style="width:161px;"
+                                            onchange="this.nextSibling.nextSibling.value=this.value;">
+                                        <option value="0">请选择品牌</option>
+                                        {volist name='brands' id='vo'}
+                                        <option value="{$vo['brand_id']}">{$vo.brand_name}</option>
+                                        {/volist}
+                                    </select>
+                                </div>
+                            </li>
+                            <li style="width:40px;"></li>
+                        </ul>
+                    </li>
+                    {volist name='attributes' id='row'}
+                    <li class="l-fieldcontainer">
+                        <ul>
+                            <li style="width:90px;text-align:right;">{$row.attribute_name}：</li>
+                            <li style="width:170px;text-align:left;position: relative;">
+                                <div style="position:relative;">
+                                    <select style="width:161px;"
+                                            onchange="this.nextSibling.nextSibling.value=this.value;">
+                                        <option value=""></option>
+                                        {volist name='row["values"]' id='vo'}
+                                        <option value="{:htmlspecialchars($vo['attribute_value'])}">{$vo.attribute_value}</option>
+                                        {/volist}
+                                    </select>
+                                    <input name="attributes[{$row.attribute_name}]" class="iInput"  required="required"/>
+                                </div>
+                            </li>
+                            <li style="width:40px;"></li>
+                        </ul>
+                    </li>
+                    {/volist}
+
+                    <li v-for="row in attributes" class="l-fieldcontainer" style="overflow: visible;">
+                        <ul>
+                            <li style="width:90px;text-align:right;overflow: visible;">{{row.name}}：<div class="l-tab-links-item-close" style="top:-6px;" data-id="{{row.id}}"></div></li>
+                            <li style="width:160px;text-align:left;position: relative;">
+                                <div class="l-text">
+                                    <input name="attributes[{{row.name}}]" class="l-text-field"  required="required" value="{{row.value}}" />
+                                </div>
+                            </li>
+                            <li style="width:40px;"></li>
+                        </ul>
+                    </li>
+                </ul>
+
+            </div>
+
+            <div id="attributes-custom">
+                <ul>
+                    <li class="l-fieldcontainer" style="overflow: visible;">
+                        <ul>
+                            <li style="width:90px;text-align:right;overflow: visible;"></li>
+                            <li style="width:170px;text-align:left;position: relative;">
+                                <button id="addAttributeDialog" type="button" class="l-button attr-add-btn">添加</button>
+                            </li>
+                            <li style="width:40px;"></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="l-group l-group-hasicon" style="margin-top: 50px;">
+                <img src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/skins/icons/communication.gif"><span>商品规格</span>
+
+                <!--<div class="togglebtn"></div>-->
+            </div>
+            <table style="width: 100%" class="spec-container">
+                <tbody>
+                <tr>
+                    <td style="width: 85px;"></td>
+                    <td style="padding-bottom: 2px;">
+                        <span class="spec-body">
+
+                        </span>
+                        <span class="spec-buttons">
+                            <button type="button" class="choose ml5 l-button">
+                                编辑
+                            </button>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <table style="width: 100%;display: none;" class="sku-table mt5">
+                <tbody>
+                <tr>
+                    <td style="width: 90px;"></td>
+                    <td>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>规格</th>
+                                <th>数量</th>
+                                <th>单价</th>
+                                <th>条形码</th>
+                                <th>商品编码</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+
+                            </tbody>
+                            <tfoot>
+                            <tr>
+                                <td colspan="5">
+                                    <button type="button" class="l-button edit-stock-popup">
+                                        编辑库存
+                                    </button>
+                                </td>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div id="sku-custom-box"
+                 style="display: block;">
+                <table id="specification-box" style="width: 100%;">
+                    <tbody>
+                    <tr v-for="row in specifications" data-id="{{row.specification_id}}" data-name="{{row.specification_name}}">
+                        <td style="width:90px;text-align: right;"><label>{{row.specification_name}}：</label></td>
+                        <td style="padding: 0 0 10px" class="values">
+                            <span v-for="vo in row.children">
+                                <input type="hidden" name="specifications[{{row['specification_id']}}_{{vo['specification_value_id']}}][specification_id]" value="{{row['specification_id']}}"/>
+                                <input type="hidden" name="specifications[{{row['specification_id']}}_{{vo['specification_value_id']}}][specification_name]" value="{{row['specification_name']}}"/>
+                                <input type="hidden" name="specifications[{{row['specification_id']}}_{{vo['specification_value_id']}}][specification_value]" value="{{vo['specification_value']}}"/>
+                                <input type="hidden" name="specifications[{{row['specification_id']}}_{{vo['specification_value_id']}}][specification_value_id]" value="{{vo['specification_value_id']}}"/>
+
+                                <input type="checkbox" value="{{vo['specification_value']}}" data-id="{{vo.specification_value_id}}" />
+                                <span>{{vo.specification_value}}</span>
+                            </span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+
+                <table class="table" id="sku-table">
+                    <tbody>
+                    <tr>
+                        <td style="width: 40px;border-top: 0;"></td>
+                        <td style="padding: 8px 0 0 50px;">
+                            <div id="do_all" style="display: none;">
+
+                            </div>
+                            <div id="sku-result">
+
+                            </div>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="l-group l-group-hasicon"><img
+                    src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/skins/icons/communication.gif"><span>计量单位</span>
+
+                <!--<div class="togglebtn hide"></div>-->
+            </div>
+            <div>
+                <ul>
+                    <li class="l-fieldcontainer">
+                        <ul>
+                            <li style="width:90px;text-align:right;">单位：</li>
+                            <li style="width:170px;text-align:left;position: relative;">
+                                <div style="position:relative;">
+                                    <select style="width:161px;" onchange="this.nextSibling.nextSibling.value=this.value;">
+                                        <option value=""></option>
+                                        <option value="件" selected>件</option>
+                                        <option value="台">台</option>
+                                        <option value="个">个</option>
+                                    </select>
+                                    <input name="prop[unit]" class="iInput" required="required" value="件">
+                                </div>
+                            </li>
+                            <li style="width:40px;"></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="l-clear"></div>
+            <div style="display: block; text-align: center;margin-top: 50px;">
+                <button type="submit" class="btn btn-primary" style="width:120px;">提交入库</button>
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div style="display: none;">
+    <div id="tempAddAttribute">
+        <div  class="form-inline">
+            <div class="form-group">
+                <table class="table table-bordered table-striped">
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label><em style="color: red;">*</em>属性</label>
+                        </th>
+                        <td>
+                            <input type="text" id="_name"  class="form-control" placeholder="名称">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label><em style="color: red;">*</em>属性值</label>
+                        </th>
+                        <td>
+                            <input type="text" id="_value" class="form-control" placeholder="值">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="/assets/js/vue.min.js"></script>
+<script>
+    var app = new Vue({
+        el: '#specification-box',
+        data: {
+            specifications:{:json_encode($specifications,true)}
+        }
+    });
+    var app_attr = new Vue({
+        el: '#attributes-container',
+        data: {
+            attributes:{:json_encode($attributes,true)}
+        }
+    });
+</script>
+
+
+<script>
+
+    /**
+     * =======================================================
+     **/
+    var __SKU_DATA = {};
+
+    function sku_data_get(sku_id) {
+        if (typeof sku_id != 'undefined' && typeof __SKU_DATA[sku_id] != 'undefined') {
+            return __SKU_DATA[sku_id];
+        }
+        return null;
+    }
+
+    function sku_data_push(sku_id, key, val) {
+        if (typeof __SKU_DATA[sku_id] == 'undefined') {
+            __SKU_DATA[sku_id] = {};
+        }
+        __SKU_DATA[sku_id][key] = val;
+    }
+
+    function sku_data_remove(sku_id) {
+        delete __SKU_DATA[sku_id];
+    }
+
+    function sku_data_remove_indexOf(str) {
+        for (var k in __SKU_DATA) {
+            if (k.indexOf(str) > -1) {
+                delete __SKU_DATA[k];
+            }
+        }
+    }
+
+    function sku_data_save_all() {
+        $("#sku-table").find("input[type='text'][data-type]").each(function (i, n) {
+            var val = $(this).val();
+            var sku_id = $(this).data('id');
+            var sku_type = $(this).data('type');
+            if (sku_type == 'price') {
+                val = parseFloat(val).toFixed(2);
+                $(this).val(val);
+            }
+            //
+            sku_data_push(sku_id, sku_type, val);
+        });
+    }
+
+    /**
+     * ====================================================================================================
+     *
+     */
+
+
+    /**
+     * 表头数据
+     * @type {*[]}
+     */
+    var default_headers = [
+        {
+            title: '<span class="required">价格（元）</span>',
+            width: 120,
+            name: 'sale_price',
+            type: 'decimal',
+            rules: {
+                required: true
+            }
+        },
+        {
+            title: '<span class="required">数量（件）</span>',
+            width: 120,
+            name: 'quantity',
+            type: 'number',
+            rules: {
+                required: true
+            }
+        },
+        {
+            title: '<span>商品编码</span>',
+            width: 120,
+            name: 'product_code',
+            type: 'text'
+        },
+        {
+            title: '<span>商品条形码</span>',
+            width: 120,
+            name: 'barcode',
+            type: 'text'
+        },
+        {
+            title: '<span>批量操作</span>',
+            width: 120,
+            name: ''
+        }
+    ];
+
+
+    var $table = $('<table><thead><tr></tr></thead><tbody><tr></tr></tbody></table>').attr({bordered:true});
+
+    for (var key in default_headers) {
+        var obj = default_headers[key];
+        if(obj.name!=''){
+            var $td = $('<td></td>').css({padding:0});
+            var $input = $('<input/>').attr({
+                type: 'text',
+                placeholder: $(obj.title).text(),
+                "data-name": obj.name
+            }).addClass("l-text do-all-" + obj.name);
+
+            if (obj.name == "price") {
+                $input.attr({
+                    'onKeyup': "required_decimal(this)"
+                });
+            }
+            if (obj.name == "total") {
+                $input.attr({
+                    'onKeyup': "required_number(this)"
+                });
+            }
+
+            $td.append($input);
+            $table.find('>tbody>tr:first-child').append($td);
+        }
+    }
+
+    $table.find('>tbody>tr:first-child').append($('<td></td>').css({padding:2,border:0,"border-left":"1px solid #ddd"}).append($('<button type="button">批量修改</button>').css({width:'auto'}).addClass('l-button').click(function () {
+        //todo
+        alert(1)
+    })));
+
+    $("#do_all").html('').append($table);
+
+
+    function getSpecificationData(){
+        var result = [];
+        $("#specification-box tr").each(function (i, n) {
+            var spec = {id:$(n).data('id'),name:$(n).data('name'),values:[]};
+            $(n).find(">td:nth-child(2)>span input[type='checkbox']:checked").each(function (j, m) {
+                var val = {id:$(m).data('id'),name:$(m).val()};
+                spec.values.push(val);
+            });
+            result.push(spec);
+        });
+        return result;
+    }
+
+    function getAllRows(data){
+        var rows = 1;
+        $.each(data, function (i, n) {
+            rows*= n.values.length;
+        });
+        return rows;
+    }
+    /**
+     * 获取剩下行数
+     * @param i
+     * @param data
+     * @returns {number}
+     * @private
+     */
+    function getRemainRows(i, data) {
+        var len = 1;
+        for (var j = i; j < data.length; j++) {
+            var h = data[j];
+            len *= h.values.length;
+        }
+        return len;
+    }
+    /**
+     **/
+    function createTableHtml(){
+        var data = getSpecificationData();
+        var rows = getAllRows(data);
+        if(rows>0){
+            $("#total").attr("readonly",true).val(0);
+            /**
+             * head
+             * @type {HTMLElement}
+             */
+            var table = document.createElement('table');
+            table.setAttribute('bordered','true');
+            var thead = document.createElement('thead');
+            var htr = document.createElement('tr');
+            $.each(data, function (i, n) {
+                var th = document.createElement('th');
+                var txt = document.createTextNode(n.name);
+                th.appendChild(txt);
+                htr.appendChild(th);
+            });
+            /**
+             * 生成表头以及批量填充
+             */
+            for (var key in default_headers) {
+                var obj = default_headers[key];
+                var th = document.createElement('th');
+//                th.style.width=obj.width+"px";
+                var txt = $(obj.title)[0];
+                th.appendChild(txt);
+                htr.append(th);
+            }
+            thead.appendChild(htr);
+            table.appendChild(thead);
+
+            /**
+             * body
+             */
+            var tbody = document.createElement('tbody');
+            for(var i=0;i<rows;i++){
+                var tr = document.createElement('tr');
+
+                /**
+                 */
+                var sku_arr = [];
+                var specifications_obj = {};
+                $.each(data, function (j, d) {
+                    var l = getRemainRows(j + 1, data);
+                    var x = i % l;
+                    var n = parseInt((i / l) % d.values.length);
+
+                    var spec_id = d.id;
+                    var spec_name = d.name;
+                    var val_id = d.values[n].id;
+                    var val_name = d.values[n].name;
+
+                    sku_arr.push(spec_id + '_'+val_id);
+
+                    specifications_obj[spec_id + '_'+val_id] = {specification_id:spec_id,specification_name:spec_name,specification_value:val_name,specification_value_id:val_id};
+
+                    if (x == 0) {
+                        var td = document.createElement('td');
+                        var val = document.createTextNode(d.values[n].name);
+                        td.appendChild(val);
+                        td.setAttribute('rowspan',l);
+                        tr.appendChild(td);
+                    }
+                });
+
+                /**
+                 *
+                 */
+                var sku_id = sku_arr.join("-");//hex_md5();
+
+                for (var k = 0; k < default_headers.length; k++) {
+                    var $td = $('<td></td>');
+                    var obj = default_headers[k];
+                    if (k < default_headers.length - 1) {
+                        if (k == 0) {
+                            $.each(specifications_obj,function (l,n) {
+                                $.each(n, function (vk,vn) {
+                                    var $input_title = $('<input type="text"/>').attr({
+                                        "name": "sku[" + sku_id + "][specifications]["+l+"]["+vk+"]",
+                                        "type": "hidden"
+                                    }).val(vn);
+                                    $td.append($input_title);
+                                });
+                            });
+                        }
+                        var $input = $('<input/>').attr({
+                            "name": "sku["+sku_id+"][" + obj.name + "]",
+                            "data-id":sku_id,
+                            "data-type": obj.name,
+                            "type":"text"
+                        }).addClass("l-text");
+                        //根据类型，给input添加相应的事件
+                        switch (obj.type) {
+                            case  'decimal':
+                                /**
+                                 *
+                                 */
+                                $input.val(0).keyup(function () {
+                                    required_decimal(this);
+
+                                    var val = $(this).val();
+                                    var sku_id = $(this).data('id');
+                                    var sku_type = $(this).data('type');
+
+                                    //price
+                                    if (val == "") {
+                                        sku_data_remove(sku_id);
+                                        return;
+                                    }
+                                    //
+                                    sku_data_push(sku_id, sku_type, val);
+
+                                });
+                                break;
+                            case 'number':
+                                /**
+                                 *
+                                 */
+                                $input.val(0).keyup(function () {
+                                    required_number(this);
+
+                                    var val = $(this).val();
+                                    var sku_id = $(this).data('id');
+                                    var sku_type = $(this).data('type');
+                                    //price
+                                    if (val == "") {
+                                        sku_data_remove(sku_id);
+                                        return;
+                                    }
+                                    //
+                                    sku_data_push(sku_id, sku_type, val);
+
+                                });
+                                break;
+                            default :
+                                /**
+                                 *
+                                 */
+                                $input.keyup(function () {
+                                    var val = $(this).val();
+                                    var sku_id = $(this).data('id');
+                                    var sku_type = $(this).data('type');
+                                    //
+                                    if (val == "") {
+                                        sku_data_remove(sku_id);
+                                        return;
+                                    }
+                                    sku_data_push(sku_id, sku_type, val);
+                                });
+                        }
+
+                        var sku_obj = sku_data_get(sku_id);
+
+                        if (sku_obj && typeof sku_obj[obj.name] != 'undefined') {
+                            $input.val(sku_obj[obj.name]);
+                        }
+                        if (typeof obj['rules'] != 'undefined') {
+                            $input.attr(obj.rules);
+                        }
+                        $td.append($input);
+                    }
+                    tr.append($td[0]);
+                }
+
+                tbody.appendChild(tr);
+            }
+            table.appendChild(tbody);
+            $("#sku-result").html('')[0].appendChild(table);
+            $("#do_all").show();
+        }else{
+            $("#do_all").hide();
+            $("#sku-result").html('');
+            $("#total").removeAttr("readonly");
+        }
+    }
+</script>
+<script type="text/javascript">
+
+    var ____SPECIFICATIONS_ALL = [];
+    var ____SPECIFICATIONS_DATA = [];
+
+    function getRemainItemRows(i,data){
+        var len = 1;
+        for (var j = i; j < data.length; j++) {
+            var h = data[j];
+            len *= h.children.length;
+        }
+        return len;
+    }
+    function getProductItemsData(data){
+        var rows = data.length>0?1:0;
+        $.each(data, function (i, n) {
+            rows*= n.children.length;
+        });
+        var result = [];
+        for(var i =0;i<rows;i++){
+
+            /**
+             */
+            var sku_ids = [];
+            var sku_names = [];
+            var specifications_obj = {};
+            $.each(data, function (j, d) {
+                var l = getRemainItemRows(j + 1, data);
+                var x = i % l;
+                var n = parseInt((i / l) % d.children.length);
+
+                var spec_id = d.specification_id;
+                var spec_name = d.specification_name;
+                var val_id = d.children[n].specification_value_id;
+                var val_name = d.children[n].specification_value;
+
+                sku_ids.push(spec_id + '_'+val_id);
+                sku_names.push(val_name);
+
+                specifications_obj[spec_id + '_'+val_id] = {specification_id:spec_id,specification_name:spec_name,specification_value:val_name,specification_value_id:val_id};
+            });
+            result.push({
+                sku_id:sku_ids.join('-'),
+                sku_name:sku_names.join(" ")
+            });
+        }
+        return result;
+    }
+
+
+    $(function () {
+
+        var subWindow = window;
+        $("#addAttributeDialog").click(function(){
+            var $target = $("#tempAddAttribute").clone().removeAttr('id');
+
+            var _dialog = window.top.$.ligerDialog.open({title:"属性添加", target: $target,isDrag:false,allowClose:true,width:400,buttons:[
+                {
+                    text:"ok",
+                    onclick:function(item,dialog){
+                        _dialog.close();
+                        var name = $target.find("#_name").val();
+                        var value = $target.find("#_value").val();
+                        if($.trim(name)==''|| $.trim(value)==''){
+                            window.top.$.ligerDialog.alert("名称或者值都不能为空");
+                            return false;
+                        }
+                        var attr_custom_list = app_attr.attributes;
+                        attr_custom_list.push({id:(new Date()).getTime(),name:name,value:value});
+                        app_attr.attributes = attr_custom_list;
+
+                    }
+                }
+            ] });
+        });
+
+        $(".spec-buttons .choose").click(function () {
+            var $box = $(this).closest('table').find(".spec-body");
+            window.top.$loader.show();
+            $.getJSON("{:url('shop/specification/getJsonAllData')}",{}, function (res) {
+                window.top.$loader.hide();
+                if(res.code==1){
+                    ____SPECIFICATIONS_ALL = res.data;
+                    var fn = $.ligerui.getPopupFn({
+                        top : 80,
+                        width:400,
+                        onSelect: function (e) {
+                            console.log(e.data);
+
+                            //vue 方式
+                            app.specifications= e.data;
+                            setTimeout(function () {
+                                createTableHtml();
+                            },300);
+
+                            //grid 方式
+//                            ____SPECIFICATIONS_DATA = e.data;
+//                            if(____SPECIFICATIONS_DATA.length>0){
+//                                $(".sku-table").show();
+//                            }else{
+//                                $(".sku-table").hide();
+//                            }
+//                            $box.html('');
+//                            $.each(e.data, function (i, n) {
+//                                var $span = $('<span></span>').addClass("label label-warning ml5").html(n.specification_name);
+//                                $box.append($span);
+//                            });
+                        },
+                        grid: {
+                            columns: [
+                                { display: '规格名称', name: 'specification_name', width: 130, type: 'text' },
+                            ], isScroll: false, checkbox: true,
+                            data: {Rows:res.data},
+                            width: '95%',
+                            usePager:false
+                        }
+                    });
+                    fn();
+                }
+            });
+        });
+
+        $(".edit-stock-popup").click(function () {
+            var data = getProductItemsData(____SPECIFICATIONS_DATA);
+            var $tbody = $(this).closest("table").find(">tbody");
+            var _ids = [];
+            $tbody.find(">tr").each(function (i, n) {
+                _ids.push($(n).data('id'));
+            });
+            console.log("data1",data,"_ids",_ids);
+            data = M(data).where_not_in('sku_id',_ids).select();
+
+            var fn = $.ligerui.getPopupFn({
+                top : 80,
+//                width:400,
+                onSelect: function (e) {
+                    console.log(e.data);
+
+                    $.each(e.data, function (i, n) {
+                        var id = n.sku_id;
+                        var $tr = $tbody.find(">tr[data-id='"+id+"']");
+                        if($tr.length>0){
+
+                        }else{
+                            $tr = $('<tr></tr>').attr('data-id',id);
+                            //item name
+                            var $td_item_name = $('<td></td>').html(n.sku_name);
+
+                            //quantity
+                            var $quantity = $('<input/>').addClass('quantity')
+                                    .attr({required:'required',type:'number',min:0})
+                                    .css({"width":42})
+                                    .val(typeof n['quantity']!='undefined'? n.quantity:0);
+                            $quantity.keyup(function () {
+                                required_number(this);
+                            });
+                            var $td_quantity = $('<td></td>').append($quantity);
+
+                            //price
+                            var $price = $('<input/>').addClass('price')
+                                    .attr({required:'required',type:'number',min:0})
+                                    .css({"width":42})
+                                    .val(typeof n['price']!='undefined'? n.price:0);
+                            $price.keyup(function () {
+                                required_decimal(this);
+                            });
+                            var $td_sale_price = $('<td></td>').append($price);
+
+                            //barcode
+                            var $barcode = $('<input/>').addClass('barcode')
+                                    .attr({required:'required',type:'text',min:0})
+                                    .val(typeof n['barcode']!='undefined'? n.barcode:'');
+                            var $td_barcode = $('<td></td>').append($barcode);
+
+                            //product_code
+                            var $product_code = $('<input/>').addClass('product_code')
+                                    .attr({required:'required',type:'text',min:0})
+                                    .val(typeof n['product_code']!='undefined'? n.product_code:'');
+                            var $td_product_code = $('<td></td>').append($product_code);
+
+                            var $textarea = $('<textarea style="height: 30px;min-height: 30px;max-height: 100px;min-width: 100px;max-width: 200px;"></textarea>');
+                            var $td_remark = $('<td></td>').append($textarea);
+
+                            $tr.append($td_item_name).append($td_quantity).append($td_sale_price).append($td_sale_price).append($td_product_code).append($td_remark);
+                            $tbody.append($tr);
+                        }
+
+                    });
+                },
+                grid: {
+                    columns: [
+                        { display: '规格ID', name: 'sku_id', width: 130, type: 'text' },
+                        { display: '规格名称', name: 'sku_name', width: 130, type: 'text' },
+                        { display: '数量', name: 'quantity', width: 80, type: 'int',min:0,editor: { type: 'int'}},
+                        { display: '单价', name: 'price', width: 80, type: 'int',min:0,editor: { type: 'float'}},
+                        { display: '条形码', name: 'barcode', width: 80, type: 'text',min:0,editor: { type: 'text'}},
+                        { display: '商品编码', name: 'product_code', width: 80, type: 'text',min:0,editor: { type: 'text'}}
+                    ],
+                    isScroll: false,
+                    checkbox: true,
+                    enabledEdit: true,
+                    data: {Rows:data},
+                    width: '95%',
+                    usePager:false
+                }
+            });
+
+            fn();
+        });
+
+
+        //选 择规格项时
+        $("body").on("change","#specification-box input:checkbox",function () {
+            createTableHtml();
+        });
+
+        $("body").on("click","#attributes-container .l-tab-links-item-close", function () {
+            var id = $(this).data('id');
+            var lst = M(app_attr.attributes).where('id','!=',id).select();
+            app_attr.attributes = lst;
+        });
+
+        $("#release-form").submit(function () {
+            var formData = $(this).serializeArray();
+
+            //检查分类ID
+            var category_id = $("#category_id").val();
+            if(!category_id){
+                alert("请重新选择分类");
+                return false;
+            }
+
+            //检查规格
+            var result = $("#specification-box tr").length>0;
+            $("#specification-box tr").each(function (i, n) {
+                result = result && $(n).find(">td:nth-child(2)>span input[type='checkbox']:checked").length>0;
+            });
+            if(!result){
+                alert("必须填写规格");
+                $("#specification-box tr:first-child>td:nth-child(2)>span:first-child input[type='checkbox']:first-child").focus();
+                return false;
+            }
+            console.log(formData);
+            $.post("{:url('shop/product/doAdd2Post')}",formData, function (res) {
+                console.log(res)
+                if(res.code==1){
+                    window.location.reload();
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg);
+                }
+
+            });
+            return false;
+        });
+    });
+
+</script>
+{/block}

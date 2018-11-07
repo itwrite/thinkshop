@@ -1,0 +1,129 @@
+{extend name="layout" /}
+{block name="center"}
+<link rel="stylesheet" href="/assets/js/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+<div class="row pb10 pt10 hide">
+    <a href="{:url('shop/product/index')}">
+        <span class="glyphicon glyphicon-arrow-left"></span> 返回
+    </a>
+</div>
+<div class="row relative">
+
+    <div class="col-sm-3 table-bordered" style="height: 400px;overflow: auto">
+        <h2 style="border-bottom: 1px solid #dddddd">
+            分类
+        </h2>
+        <ul id="categories">
+
+        </ul>
+    </div>
+    <div class="col-sm-3 table-bordered" style="height: 400px;overflow: auto;">
+        <h2 style="border-bottom: 1px solid #dddddd">
+            品牌
+        </h2>
+        <ul id="brands" role="listbox" hidefocus="-1" unselectable="on"
+            class="cc-cbox-cont" style="display: none;">
+            <li class="cc-cbox-group">
+                <div class="cc-cbox-gname"></div>
+                <ul class="cc-cbox-gcont">
+                    <li class="cc-cbox-item cc-hasChild-item"></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+</div>
+<div class="col-sm-12 ">
+    <form id="go-release-form" action="{:url('product/add2')}" method="get">
+        <input type="hidden" name="category_id" value="0">
+        <input type="hidden" name="brand_id" value="0">
+        <div class="row text-center">
+            <button id="go_release" class="btn" disabled="disabled">现在发布商品</button>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    var __brand_data = [];
+    var __current_cat_id = 0;
+
+    function render_brands(row){
+        if(row.data  !='undefined'){
+            var $brands = $("#brands").html('').show();
+            for(var i in row.data){
+                var g = row.data[i];
+                var $li_group = $('<li></li>').addClass('cc-cbox-group');
+                var $g_name = $('<div></div>').addClass('cc-cbox-gname').html(g.key);
+                $li_group.append($g_name);
+                var $ul = $('<ul></ul>').addClass('cc-cbox-gcont');
+                $li_group.append($ul);
+//                console.log(g)
+                if(g.data !='undefined'){
+
+                    for(var j in g.data){
+                        var brand = g.data[j];
+                        var $li_item = $('<li></li>').addClass('cc-cbox-item cc-hasChild-item').html(brand.text);
+                        $ul.append($li_item);
+                    }
+
+                }
+                $brands.append($li_group);
+            }
+        }
+    }
+
+    $(function () {
+        $("#categories").ligerTree({
+            checkbox: false,
+            data: [],
+            nodeWidth: "auto",
+            onSelect: function (node) {
+
+                $("#go_release").attr({disabled: true}).removeClass("btn-primary");
+
+                __current_cat_id = 0;
+                if (node.data.children) {
+                    if (node.data.children.length < 1) {
+                        category_tree.loadData(node.target, "{:url('shop/category/getJsonTreeData')}", {parent_id: node.data.id});
+                    }
+                    return;
+                }
+
+                window.top.$loader.show();
+                __current_cat_id = node.data.id;
+//                            alert(__current_cat_id)
+                $("#go-release-form input[name='category_id']").val(__current_cat_id);
+                $("#go_release").removeAttr('disabled').addClass("btn-primary");
+
+
+                var row = M(__brand_data).where({category_id: __current_cat_id}).find();
+//                            console.log(row)
+
+                if (row) {
+
+                    render_brands(row)
+                    window.top.$loader.hide();
+                } else {
+
+                    $.get("{:url('shop/brand/getJsonData')}", {category_id: __current_cat_id},function (e) {
+                        __brand_data.push({category_id: node.data.id, data: e.data});
+                        render_brands(e);
+
+                        window.top.$loader.hide();
+                    });
+                }
+            }
+        });
+
+        /**
+         *
+         * @type {*|jQuery}
+         */
+        var category_tree = $("#categories").ligerGetTreeManager();
+        category_tree.clear();
+        category_tree.loadData(null, "{:url('shop/category/getJsonTreeData')}", null);
+    });
+
+
+</script>
+{/block}
+{block name="script"}
+{/block}

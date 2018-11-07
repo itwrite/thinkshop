@@ -1,0 +1,367 @@
+body{
+    padding-bottom: 50px;
+}
+footer.navbar-fixed-bottom{
+    border-top: 1px solid #dddddd;
+    background: #EEEEEE;
+}
+/** ============================================================= */
+.cc-cbox-cont, .cc-tree-cont {
+    padding: 0 3px;
+    margin-top: 10px;
+}
+
+ul, ol {
+    list-style: none;
+}
+
+.cc-cbox-group {
+    position: relative;
+}
+
+.cc-cbox-gname {
+    /*float: left;*/
+    background: #AAA;
+    color: #FFF;
+    display: inline-block;
+    font-style: normal;
+    height: 13px;
+    line-height: 13px;
+    text-align: center;
+    text-transform: uppercase;
+    width: 13px;
+    position: absolute;
+    margin-left: 16px;
+    margin-top: 5px;
+    overflow: hidden;
+}
+
+li.cc-hasChild-item {
+
+}
+
+.cc-cbox-item {
+    padding: 0 16px;
+}
+
+.cc-cbox-item {
+    background-color: #FFF;
+    border: 1px solid #FFF;
+    height: 24px;
+    line-height: 24px;
+    overflow: hidden;
+    cursor: pointer;
+    padding-left: 6px;
+    border-radius: 4px;
+}
+
+.cc-cbox-item:hover, .cc-cbox-item.focus {
+    background-color: #ddd;
+    border: 1px solid #EEE;
+}
+
+/** ============================================================= */
+@media (min-width: 768px) {
+    .main-container {
+        width: 750px;
+    }
+}
+
+@media (min-width: 992px) {
+    .main-container {
+        width: 970px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .main-container {
+        width: 1170px;
+    }
+}
+
+.navbar {
+    margin-bottom: 0;
+}
+
+/** ================================================================================= */
+#categories .ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#categories .ui-autocomplete ul, .ui-autocomplete li {
+    margin-left: 5px;
+    list-style-type: none;
+}
+
+#categories .ui-autocomplete-category {
+    font-weight: bold;
+}
+
+/** ================================================================================= */
+
+.sku-list li {
+    display: inline-block;
+    /*width: 165px;*/
+    min-width: 100px;
+    padding: 2px;
+    overflow: hidden;
+    vertical-align: middle
+}
+
+.sku-list .labelname, .sku-style .sku-list input {
+    vertical-align: middle
+}
+
+.sku-list .labelname {
+    /*width: 100px;*/
+    height: 22px;
+    line-height: 23px;
+    overflow: hidden;
+    white-space: nowrap;
+    /*padding-left: 5px;*/
+    display: inline-block
+}
+
+.sku-list .editbox {
+    width: 95px;
+    padding: 2px;
+    margin-left: 5px
+}
+
+.sku-list .edit .labelname, .sku-list li .editbox {
+    display: none
+}
+
+.sku-list .edit .editbox {
+    display: inline
+}
+
+.sku-list input.text {
+    width: 106px;
+    padding: 2px 0 2px 2px
+}
+
+.sku-list .color-lump {
+    margin-top: -2px;
+    overflow: hidden;
+    width: 14px;
+    height: 14px;
+    min-height: 14px;
+    padding-left: 0px;
+    display: inline-block;
+    border: 1px solid #E4E4E4;
+    vertical-align: middle
+}
+
+.sku-mapfeed {
+    margin-top: 5px;
+    margin-left: 100px
+}
+
+.sku-map {
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: auto;
+    display: inline-block
+}
+
+.sku-map .msg-tip {
+    text-align: center
+}
+
+.sku-map .msg-tip em {
+    font-weight: 700
+}
+
+.sku-style th {
+    background-color: #EDEDED;
+    border: 1px solid #D7D7D7;
+    font-weight: 400;
+    height: 25px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.sku-style .required {
+    background: url(//img.alicdn.com/tps/i4/T1ZUmIXcFkXXXXXXXX-5-6.png) -999em -999em no-repeat;
+}
+
+.sku-style .required {
+    display: inline-block;
+    padding-right: 10px;
+    background-position: right center;
+    margin: 2px;
+}
+
+.sku-style td {
+    border: 1px solid #D7D7D7;
+    padding: 3px 5px;
+    text-align: center;
+    vertical-align: middle;
+    height: 25px;
+    min-width: 60px;
+}
+
+.sku-style td input {
+    width: 90%;
+}
+
+.msg-attention {
+    display: inline-block;
+    background-color: #e5f4fe;
+    border: 1px solid #3fb2fe;
+    padding: 3px 5px 3px 20px;
+}
+
+.msg-attention .icon {
+    margin-left: -18px;
+    float: left;
+    display: inline-block;
+    background: url(//img.alicdn.com/tps/i3/T1h48sFa8iXXXU.ckt-64-231.png) -999em -999em no-repeat;
+    overflow: hidden;
+    vertical-align: text-top;
+}
+
+.msg-attention .msg {
+    white-space: normal;
+    padding: 0;
+    margin: 0;
+    font-size: 12px;
+}
+
+.msg-attention .icon-attention {
+    width: 16px;
+    height: 16px;
+    line-height: 16px;
+    background-position: 0 -60px;
+}
+/** ================ **/
+
+.image-list {
+    display: inline-block;
+    padding-left: 0;
+}
+.image-list li{
+    border: 0;
+    display: inline-block;
+    position: relative;
+    vertical-align: middle;
+    margin: 0 10px 0 0;
+    cursor: pointer;
+}
+.image-list li a{
+    cursor: pointer;
+    text-decoration: none;
+}
+.image-list li.primary,.image-list li.others li{
+    border: 1px solid #cdcdcd;
+    height: 100px;
+    width: 100px;
+}
+
+.image-list li.others li .preview{
+    cursor: move;
+}
+
+.image-list li .preview {
+    z-index: 2;
+    display: none;
+    text-align: center;
+    line-height: 90px;
+    font-family: arial;
+    background-color: #f6f6f6;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+.image-list li .buttons{
+    z-index: 0;
+    display: block;
+    text-align: center;
+    line-height: 90px;
+    font-family: arial;
+    background-color: #f6f6f6;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    top:0;
+    padding-top: 8px;
+}
+
+.image-list li .info {
+    height: 24px;
+    display: inline-block;
+    position: absolute;
+    background: rgba(47, 47, 47, 0.60);
+    color: #fff;
+    left: 0;
+    top: 0;
+    z-index: 1;
+    width: 100%;
+    text-align: center;
+    filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#b2404040, endColorstr=#b2404040)";
+}
+
+.image-list .operate{
+    color: #FFFFFF;
+    padding: 2px;
+    display: none;
+    position: absolute;
+    right:0;
+    top: 0;
+    z-index: 5;
+    background: rgba(47, 47, 47, 0.60);
+}
+
+.image-list .operate em{
+    color: #f60;
+}
+
+.image-list .progress{
+    height: 18px;
+    display: none;
+    position: absolute;
+    border-radius: 0;
+    right:0;
+    top: 0;
+    z-index: 2;
+    background: rgba(47, 47, 47, 0.60);
+    width: 100%;
+}
+
+.image-list li.has-img>.preview{
+    display: block;
+}
+
+.image-list li.has-img:hover>.operate{
+    display: block;
+}
+.image-list li.processing>.progress{
+    display: block;
+}
+
+.image-list li .info em {
+    color: #f60;
+}
+
+.image-list li .operate .glyphicon{
+    font-size: 20px;
+    margin: 0 2px;
+}
+
+.image-list li .preview img{
+    max-width: 98px;
+    max-height: 98px;
+    vertical-align: middle;
+}
+
+.image-list li .buttons{
+    font-size: 42px;
+}

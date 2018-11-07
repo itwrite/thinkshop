@@ -1,0 +1,312 @@
+{extend name="layout" /}
+{block name="center"}
+<script src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/js/plugins/ligerForm.js" type="text/javascript"></script>
+<script src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/js/plugins/ligerTextBox.js" type="text/javascript"></script>
+<script src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/js/plugins/ligerMenu.js" type="text/javascript"></script>
+<script src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/js/plugins/ligerGrid.js" type="text/javascript"></script>
+<script src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/js/plugins/ligerListBox.js" type="text/javascript"></script>
+<script src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/js/plugins/ligerToolBar.js" type="text/javascript"></script>
+
+<style type="text/css">
+    .l-button {
+        width: 120px;
+        float: left;
+        margin-left: 10px;
+        margin-bottom: 2px;
+        margin-top: 2px;
+    }
+
+    .message {
+        /*position: absolute;*/
+        /*left: 100px;*/
+        /*top: 100px;*/
+        background: #FFFCC7;
+        border: 1px solid #FFC340;
+        padding: 10px;
+    }
+
+    .message:after {
+        content: " ";
+        clear: both;
+        display: block;
+    }
+</style>
+<div id="message1" class="message" style="display: none;">
+    这里是内容。。。
+    这个元素使用ligerTip，不传入任何参数，将会利用这个Dom元素的title作为ligerTip的content
+</div>
+
+<div id="maingrid">
+</div>
+
+<div style="display: none;">
+    <div id="specification-box" style=" margin:3px;">
+        <form  name="form1" method="post" style="text-align: center;">
+            <input type="hidden" name="category_id" value="0">
+            <input type="hidden" name="specification_ids" value="">
+            <div class="listbox1">
+
+            </div>
+            <br/>
+            <input type="submit" value="提交" class="l-button l-button-submit"/>
+        </form>
+    </div>
+</div>
+<div id="target1" style=" margin:3px; display:none;">
+    <form id="form1" name="form1" method="post" style="text-align: center;">
+        <input type="hidden" name="parent_id" value="0">
+        <table cellpadding="0" cellspacing="0" class="l-table-edit">
+            <tr>
+                <td align="right" class="l-table-edit-td">名称:</td>
+                <td align="left" class="l-table-edit-td">
+                    <input name="category_name" type="text" id="txtName" ltype="text" value=""/>
+                </td>
+                <td align="left"></td>
+            </tr>
+        </table>
+        <br/>
+        <input type="submit" value="提交" id="Button1" class="l-button l-button-submit"/>
+    </form>
+
+</div>
+
+
+<div id="edit-dialog" style=" margin:3px; display:none;">
+    <form id="formEdit" name="form1" method="post" style="text-align: center;">
+        <input type="hidden" name="category_id" value="0">
+        <table cellpadding="0" cellspacing="0" class="l-table-edit">
+            <tr>
+                <td align="right" class="l-table-edit-td">名称:</td>
+                <td align="left" class="l-table-edit-td">
+                    <input name="category_name" type="text" ltype="text" value=""/>
+                </td>
+                <td align="left"></td>
+            </tr>
+        </table>
+        <br/>
+        <input type="submit" value="提交" class="l-button l-button-submit"/>
+    </form>
+
+</div>
+
+{/block}
+
+{block name="script"}
+
+<script type="text/javascript">
+    function alert(message) {
+        $.ligerDialog.alert(message.toString(), '提示信息');
+    }
+    function tip(message) {
+        $.ligerDialog.tip({title: '提示信息', content: message.toString()});
+    }
+
+    var manager;
+    var currentParentRow = null;
+    $(function () {
+        $("form").ligerForm();
+        var menu = $.ligerMenu({
+            width: 120, items: [
+
+                {
+                    id: "addSubClass",
+                    text: '添加子类',
+                    click: function () {
+                        var row = manager.getSelectedRow();
+                        $("#form1 input[name='parent_id']").val(row.id);
+                        //
+                        openAddCatDialog();
+                    }, icon: 'add'
+                },
+                {
+                    id: "modify",
+                    text: '修改名称',
+                    click: function () {
+                        //
+                        var row = manager.getSelectedRow();
+                        console.log(row);
+                        $("#formEdit input[name='category_id']").val(row.id);
+                        $("#formEdit input[name='category_name']").val(row.name);
+
+                        openEditCatDialog();
+
+                    }, icon: 'modify'
+                },
+
+                    /**/
+                {
+                    id: "delete",
+                    text: '删除',
+                    click: function () {
+                        window.top.$.ligerDialog.confirm('您确定要删除吗？', function (yes) {
+                            var row = manager.getSelectedRow();
+                            console.log(row);
+                            if(yes==true){
+                                $.post("{:url('shop/category/doDelete')}", {category_id: row.id}, function (res) {
+                                    if (res.code == 1) {
+                                        manager.reload();
+                                    } else {
+                                        window.top.$.ligerDialog.alert(res.msg)
+                                    }
+                                });
+                            }
+
+                        });
+
+                    }, icon: 'delete'
+                },
+                     /**/
+                {
+                    id: "line1",
+                    line: true
+                },
+                {
+                    id: "manageProductProp",
+                    text: '商品属性',
+                    click: function () {
+                        var row = manager.getSelectedRow();
+                        window.location.href = "{:url('shop/attribute/index')}?category_id=" + row.id;
+                    }
+                },
+                {
+                    id: "manageProductProp",
+                    text: '关联规格',
+                    click: function () {
+                        var row = manager.getSelectedRow();
+                        topLoading().show();
+                        $.get("{:url('shop/category/getJsonRelativeSpecificationsData')}",{category_id:row.id}, function (res) {
+                            topLoading().hide();
+                            console.log(res);
+                            if(res.code==1){
+                                openSpecificationRelationDialog(row,res.data);
+                            }else{
+                                alert(res.msg)
+                            }
+                        });
+
+                    }
+                }
+            ]
+        });
+
+        manager = $("#maingrid").ligerGrid({
+                    columns: [
+                        {display: '商品分类', name: 'name', width: 400, align: 'left', editor: {type: 'text'}}
+                    ],
+                    width: '97%',
+                    height: '97%',
+                    onSelectRow: function (rowdata, rowindex, rowdom) {
+                    },
+                    enabledEdit: false,
+                    data: {
+                        Rows: []
+                    },
+                    url: "{:url('shop/category/getJsonGridTreeData')}",
+                    usePager: false,       //服务器分页
+                    alternatingRow: false,
+                    tree: {columnName: 'name'},
+                    checkbox: false,
+                    autoCheckChildren: false,
+//                    onRClickToSelect: true,
+                    onContextmenu: function (parm, e) {
+                        manager.select(parm.row);
+
+                        if (manager.isLeaf(parm.row)) {
+                            menu.setEnabled('manageProductProp');
+                        } else {
+                            menu.setDisabled('manageProductProp');
+                        }
+                        menu.show({top: e.pageY, left: e.pageX});
+                        return false;
+                    },
+                    toolbar: {
+                        items: [
+                            {
+                                text: '新增根类',
+                                click: function () {
+                                    $("#form1 input[name='parent_id']").val(0);
+                                    openAddCatDialog();
+                                },
+                                icon: 'add'
+                            }
+                        ]
+                    }
+                }
+        );
+
+    });
+
+
+    function openAddCatDialog() {
+        var $target = $("#target1").clone();
+        $target.find("#form1").submit(function () {
+            var formData = $(this).serialize();
+            $.post("{:url('shop/category/doAdd')}", formData, function (res) {
+                _dialog.close();
+                if (res.code == 1) {
+                    manager.reload();
+                } else {
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+
+            });
+            return false;
+        });
+        var _dialog = window.top.$.ligerDialog.open({target: $target, isDrag: false, allowClose: true});
+    }
+    function openEditCatDialog() {
+        var $target = $("#edit-dialog").clone();
+        $target.find("#formEdit").submit(function () {
+            var formData = $(this).serialize();
+            $.post("{:url('shop/category/doEdit')}", formData, function (res) {
+                _dialog.close();
+                if (res.code == 1) {
+                    manager.reload();
+                } else {
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+
+            });
+            return false;
+        });
+        var _dialog = window.top.$.ligerDialog.open({target: $target, isDrag: false, allowClose: true});
+    }
+    function openSpecificationRelationDialog(category,data) {
+        var $target = $("#specification-box").clone();
+//        $target.find("input[name='category_id']").val(category.id);
+        $target.find(".listbox1").attr({id:"listbox1"}).ligerListBox({
+            isShowCheckBox: true,
+            isMultiSelect: true,
+            data:data.specifications,
+            onSelected: function (id,text,row) {
+                console.log(arguments)
+
+            }
+        });
+        liger.get("listbox1").setValue(data.checkedIds);
+        $target.find("form").submit(function () {
+            var formData = {category_id:category.id};
+            var selecteds = liger.get("listbox1").getSelectedItems();
+            var ids = [];
+            if(selecteds){
+                $.each(selecteds, function (i, row) {
+                    ids.push(row.id);
+                });
+            }
+
+            formData['specification_ids'] = ids.join(',');
+            $.post("{:url('shop/category/doAjaxConnectToSpecification')}", formData, function (res) {
+                _dialog.close();
+                if (res.code == 1) {
+                    manager.reload();
+                } else {
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+            });
+            return false;
+        });
+        var _dialog = window.top.$.ligerDialog.open({target: $target, isDrag: false, allowClose: true});
+    }
+
+</script>
+{/block}

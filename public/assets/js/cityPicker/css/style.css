@@ -1,0 +1,138 @@
+
+.clearfix:after {
+    display: block;
+    height: 0;
+    clear: both;
+    content: ''
+}
+
+.clearfix {
+    zoom: 1
+}
+
+.cityPicker .citys {
+    background-color: #FFFEC6;
+    position: absolute;
+    float: right;
+    border: solid 1px #f7e4a5;
+    z-index: 20000;
+    top: 23px;
+    left: 0;
+    min-width: 214px;
+    display: none;
+    white-space: wrap;
+}
+
+.citys span {
+    line-height: 2;
+    margin-right: 2px
+}
+
+.cityPicker .dcity {
+    vertical-align: middle;
+    display: block;
+    z-index: 1
+}
+
+.cityPicker .ecity {
+    position: relative;
+    float: left;
+    margin-right: 1px;
+    padding-right: 8px;
+    height: 30px;
+}
+
+.cityPicker .gcity, .cityPicker .province-list {
+    display: inline-block
+}
+
+.cityPicker .province-list {
+    min-width: 450px;
+    margin-left: 15px;
+}
+
+.cityPicker .trigger {
+    width: 8px;
+    height: 8px;
+    padding: 2px;
+    cursor: pointer;
+    -webkit-box-sizing: initial;
+    -moz-box-sizing: initial;
+    box-sizing: initial;
+}
+.cityPicker{
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.cityPicker li span.areas {
+    margin-right: 3px;
+    padding: 4px 0 1px 4px;
+    display: inline-block
+}
+
+.cityPicker span.gareas {
+    white-space: nowrap;
+    margin-right: 3px;
+    padding: 4px 4px 1px;
+    display: inline-block;
+    position: relative;
+    height: 17px;
+    border: 1px solid #fff
+}
+
+.cityPicker .even span.gareas {
+    background-color: #ECF4FF;
+    border-color: #ecf4ff
+}
+
+.cityPicker li span.egareas {
+    margin-right: 3px;
+    padding: 3px 0 1px;
+    display: inline-block;
+    background-color: #FFFEC6;
+    border: solid 1px #f7e4a5;
+    width: 70px
+}
+
+.cityPicker .showCityPop {
+    z-index: 55556
+}
+
+.cityPicker .showCityPop .gareas {
+    background-color: #FFFEC6;
+    border: solid 1px #f7e4a5;
+    border-bottom: solid 1px #FFFEC6;
+    z-index: 56000;
+    -webkit-box-sizing: initial;
+    -moz-box-sizing: initial;
+    box-sizing: initial;
+}
+
+.cityPicker .even .showCityPop .gareas {
+    background-color: #FFFEC6;
+    border-color: #f7e4a5 #f7e4a5 #FFFEC6
+}
+
+.cityPicker .showCityPop .citys {
+    display: block;
+    z-index: 55900
+}
+
+.cityPicker label {
+    margin: 0 1px
+}
+
+.cityPicker .check_num {
+    color: #F60;
+    font-size: 12px;
+    letter-spacing: -1px
+}
+
+.cityPicker .ecity.gcity{
+    margin-top: 5px;
+}
+
+.cityPicker label{
+    font-weight: 100;
+}

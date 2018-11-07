@@ -1,0 +1,57 @@
+{extend name="layout" /}
+{block name="center"}
+
+<table rel="border" cellspacing="0" cellpadding="0" id="list_table">
+    <thead>
+    <tr>
+        <th width="45"><input type="checkbox" role="checkall" data-item="ids"></th>
+        <th width="200">名称</th>
+        <th width="*">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {if count($list)>0}
+    {volist name='list' id='row'}
+    <tr>
+        <td><input type="checkbox" name="ids[{$row.employee_id}]" item="ids" value="47"></td>
+        <td>{$row.employee_name}</td>
+
+       <td>
+            <a data-id="{$row.employee_id}" class="btn btn-danger btn-sm btn-delete">
+                辞退
+            </a>
+        </td>
+    </tr>
+    {/volist}
+    {else}
+    <tr>
+        <td colspan="3">
+            无数据
+        </td>
+    </tr>
+    {/if}
+    </tbody>
+</table>
+
+{/block}
+{block name="script"}
+<script>
+    var subWindow = window;
+
+    $("#list_table").on("click",'.btn-delete',function(){
+        var employee_id = $(this).data('id');
+        if(confirm("确定删除？")){
+            $.post("{:url('shop/attribute/doDelete')}",{employee_id:employee_id}, function (res) {
+                console.log(res);
+                if(res.code==1){
+                    window.location.reload();
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+            });
+        }
+
+    });
+
+</script>
+{/block}

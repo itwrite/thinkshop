@@ -1,0 +1,122 @@
+{extend name="layout" /}
+{block name="center"}
+
+<form method="post" action="{:url('shop/brand/doUpdate')}">
+    <div class="btn-group" role="group" aria-label="...">
+        <button type="submit" class="btn btn-warning btn-sm">批量更新</button>
+        <button type="button" class="btn btn-default btn-sm addBrandDialog">添加</button>
+    </div>
+    <table rel="border" cellspacing="0" cellpadding="0" id="list_table">
+        <thead>
+        <tr>
+            <th width="45"><input type="checkbox" role="checkall" data-item="ids"></th>
+            <th width="30">ID</th>
+            <th width="260">名称</th>
+            <th width="*">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {if count($list)}
+        {volist name='list' id='row'}
+        <tr>
+            <td><input type="checkbox" name="ids[{$row.brand_id}]" item="ids" value="{$row.brand_id}"></td>
+            <td>{$row.brand_id}</td>
+            <td>
+                <input type="text" class="form-control" name="rows[{$row.brand_id}][brand_name]" value="{$row.brand_name}">
+            </td>
+            <td>
+                <a data-id="{$row.brand_id}" class="btn btn-danger btn-sm btn-delete">
+                    删除
+                </a>
+            </td>
+        </tr>
+        {/volist}
+        {else}
+        <tr>
+            <td colspan="8">
+                暂无数据
+            </td>
+        </tr>
+        {/if}
+        </tbody>
+    </table>
+    <div>
+        {$list}
+    </div>
+    <div class="btn-group" role="group" aria-label="...">
+
+        <!--<button type="submit" class="btn btn-warning btn-sm">更新</button>-->
+    </div>
+</form>
+
+
+<div style="display: none;">
+    <div id="tempAddBrand">
+        <form  class="form-inline" method="POST" target="_self">
+            <div class="form-group">
+                <table class="table table-bordered table-striped table-brand-list">
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label><em style="color: red;">*</em>规格名称</label>
+                        </th>
+                        <td>
+                            <input type="text" id="_name" name="brand_name" required="required"
+                                   class="form-control" placeholder="名称">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+
+</div>
+{/block}
+{block name="script"}
+<script>
+    var subWindow = window;
+    $(".addBrandDialog").click(function(){
+        var $target = $("#tempAddBrand").clone().removeAttr('id');
+        $target.find("form").submit(function () {
+            var formData = $(this).serialize();
+            $.post("{:url('shop/brand/doAdd')}",formData, function (res) {
+
+                console.log(res);
+                _dialog.hide();
+                if(res.code==1){
+                    window.location.reload();
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+
+            });
+            return false;
+        });
+        var _dialog = window.top.$.ligerDialog.open({title:"规格添加", target: $target,isDrag:false,allowClose:true,width:400,buttons:[
+            {
+                text:"ok",
+                onclick:function(item,dialog){
+                    $target.find("form").submit();
+                }
+            }
+        ] });
+    });
+
+    $("#list_table").on("click",'.btn-delete',function(){
+        var brand_id = $(this).data('id');
+        if(confirm("确定删除？")){
+            $.post("{:url('shop/brand/doDelete')}",{brand_id:brand_id}, function (res) {
+                console.log(res);
+                if(res.code==1){
+                    window.location.reload();
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+            });
+        }
+
+    });
+
+</script>
+{/block}

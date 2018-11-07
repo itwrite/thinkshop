@@ -1,0 +1,384 @@
+{extend name="base" /}
+{block name="center"}
+
+<style>
+
+    table[bordered] {
+        width: auto;
+    }
+
+    table[bordered] th{
+        border-left: 1px solid #ddd;
+        border-right: 1px solid #ddd;
+        border-top: 1px solid #ddd;
+        font-weight: bold;
+        text-align: center;
+        vertical-align: middle;
+    }
+    table[bordered] td {
+        border: 1px solid #ddd;
+        min-width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        padding: 5px;
+    }
+
+    table[bordered] tr > td:last-child, table[bordered] tr > th:last-child {
+        width: auto !important;
+    }
+    table[bordered] tr>td:not(:last-child),table[bordered] tr>th:not(:last-child){
+        border-right:0;
+    }
+    table[bordered] tr:not(:first-child)>td{
+        border-top:0;
+    }
+
+    .container{
+        width: auto !important;
+    }
+    .hide {
+        display: none;
+    }
+
+    .l-text {
+        width: auto;
+    }
+
+    .l-text-field {
+        height: 18px;
+        line-height: 18px;
+    }
+
+    .table-bordered>tbody>tr>td{
+        padding: 4px;
+    }
+    .l-fieldcontainer>ul>li:first-child{
+        width: 90px;
+        text-align: right;
+        font-weight: 600;
+    }
+    .l-fieldcontainer>ul>li:nth-child(2){
+        width:170px;
+        text-align:left;
+        padding: 0 8px;
+        overflow: hidden;
+    }
+    /** ================================================================================= */
+
+
+    .clearfix {
+        clear: both;
+    }
+
+    .clearfix:after {
+        content: " ";
+        clear: both;
+        display: block;
+    }
+    .form-header{
+        border: 1px solid #dddddd;
+    }
+    .form-header:after{
+        display: block;
+        content: " ";
+        clear: both;
+    }
+    .form-body th,.form-body td{
+        text-align: center;
+    }
+    select{
+        margin: 4px auto 0 auto;
+    }
+</style>
+
+
+<form id="release-form" class="form-horizontal" method="post"
+      enctype="multipart/form-data">
+
+    <div  class="l-form" style="max-width: 1060px;">
+        <div class="l-form-container">
+
+
+            <div class="form-header">
+                <h3 style="text-align: center;margin: 15px auto;">
+                    出库单
+                </h3>
+                <ul>
+                    <li class="l-fieldcontainer l-fieldcontainer-first">
+                        <ul>
+                            <li >制单日期：</li>
+                            <li>
+                                {:date('Y-m-d')}
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="l-fieldcontainer ">
+                        <ul>
+                            <li>仓库：</li>
+                            <li>
+                                <select>
+                                    <option>1号仓库</option>
+                                    <option>2号仓库</option>
+                                    <option>3号仓库</option>
+                                </select>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="l-fieldcontainer ">
+                        <ul>
+                            <li >类型：</li>
+                            <li style="">
+                                出库
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="l-fieldcontainer ">
+                        <ul>
+                            <li >经办人：</li>
+                            <li>
+                                {$user_name}
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="l-fieldcontainer ">
+                        <ul>
+                            <li >订单号：</li>
+                            <li>
+                                PO{:date('YmdHis')}
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="l-fieldcontainer ">
+                        <ul>
+                            <li >备注：</li>
+                            <li>
+                                <textarea style="height: 40px;min-height: 40px;max-height: 100px;min-width: 100%;max-width: 100%;"></textarea>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="form-body">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th style="width: 200px;">商品名称</th>
+                        <th style="width: 220px;">规格型号</th>
+                        <th style="width: 60px;">单位</th>
+                        <th style="width: 60px;">库存</th>
+                        <th style="width: 60px;">数量</th>
+                        <th style="width: 60px;">单价</th>
+                        <th style="width: 60px;">金额</th>
+                        <th style="width: 160px">备注</th>
+                        <th>操作</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+
+                    </tbody>
+                    <tfoot>
+                    <tr>
+                        <td colspan="9">
+                            <button type="button" class="btn btn-default btn-add-product">
+                                添加商品+
+                            </button>
+                        </td>
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="l-clear"></div>
+            <div style="display: block; text-align: center;margin-top: 50px;">
+                <button type="submit" class="btn btn-primary" style="width:120px;">提交出库</button>
+            </div>
+        </div>
+
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script>
+
+    /*
+     该例子实现 表单分页多选
+     即利用onCheckRow将选中的行记忆下来，并利用isChecked将记忆下来的行初始化选中
+     */
+    var __checkedRowIds = [];
+    function findCheckedItemById(id)
+    {
+        for(var i =0;i<__checkedRowIds.length;i++)
+        {
+            if(__checkedRowIds[i] == id) return i;
+        }
+        return -1;
+    }
+    function addCheckedItem(row)
+    {
+        addCheckedItemId(getKey(row))
+    }
+    function addCheckedItemId(id)
+    {
+        if(findCheckedItemById(id) == -1)
+            __checkedRowIds.push(id);
+    }
+    function removeCheckedItem(row)
+    {
+        var i = findCheckedItemById(getKey(row));
+        if(i==-1) return;
+        __checkedRowIds.splice(i,1);
+        $(".form-body").find(">table tr[data-id='"+getKey(row)+"']").remove();
+    }
+    function f_isChecked(row)
+    {
+       return findCheckedItemById(getKey(row)) >-1
+    }
+    function f_onCheckRow(checked, row)
+    {
+        if (checked) addCheckedItem(row);
+        else removeCheckedItem(row);
+    }
+    function f_onCheckAllRow(checked)
+    {
+        for (var i in this.records)
+        {
+            if(checked)
+                addCheckedItem(this.records[i]);
+            else
+                removeCheckedItem(this.records[i]);
+        }
+    }
+
+    function getKey(row){
+        return row.product_id+"_"+row.item_id
+    }
+    $(function () {
+//扩展currency类型的格式化函数
+        $.ligerDefaults.Grid.formatters['currency'] = function (num, column) {
+            //num 当前的值
+            //column 列信息
+            if (!num) return "￥0.00";
+            num = num.toString().replace(/\$|,/g, '');
+            if (isNaN(num))
+                num = "0.00";
+            var sign = (num == (num = Math.abs(num)));
+            num = Math.floor(num * 100 + 0.50000000001);
+            var cents = num % 100;
+            num = Math.floor(num / 100).toString();
+            if (cents < 10)
+                cents = "0" + cents;
+            for (var i = 0; i < Math.floor((num.length - (1 + i)) / 3); i++)
+                num = num.substring(0, num.length - (4 * i + 3)) + ',' +
+                num.substring(num.length - (4 * i + 3));
+            return "￥" + (((sign) ? '' : '-') + '' + num + '.' + cents);
+        };
+
+        $(".btn-add-product").click(function () {
+//            topLoading().show();
+            var params = {product_ids:[],item_ids:[]};
+            $.each(__checkedRowIds, function (i, n) {
+                params['product_ids'].push(n.split("_")[0]);
+                params['item_ids'].push( n.split("_")[1]);
+            });
+            var needClearRows = {};
+            var fn = $.ligerui.getPopupFn({
+                condition:{
+                    fields: [
+                        { name: 'product_name', type: 'text', label: '商品名称', width: 200 }
+                    ]
+                },
+                top : 80,
+
+//                selectInit: function (row) {
+//                    topLoading().hide();
+//                    return f_isChecked(row);
+//                },
+                onSelect: function (e) {
+
+                    console.log("eeee",arguments)
+                    __checkedRowIds = [];
+                    var $tbody = $(".form-body table tbody");
+                    $.each(e.data, function (i, n) {
+
+                        var id = getKey(n);
+                        var $tr = $tbody.find(">tr[data-id='"+id+"']");
+                        if($tr.length<1){
+
+                            var name_prefix = 'items['+n.item_id+']';
+                            var $item_id = $('<input type="hidden" name="'+name_prefix+'[item_id]"/>').val(n.item_id);
+                            $tr = $('<tr></tr>').attr('data-id',id);
+                            var $td_product_name = $('<td></td>').html(n.product_name);
+                            var $td_item_name = $('<td></td>').html(n.item_name);
+                            var $td_unit = $('<td></td>').html(n.unit);
+                            var $td_stock = $('<td></td>').html(n.quantity);
+                            var $quantity = $('<input/>').addClass('quantity')
+                                    .attr({required:'required',type:'number',min:0,max:n.quantity,name:name_prefix+"[quantity]","data-price": n.sale_price})
+                                    .css({"min-width":42});
+                            $quantity.keyup(function () {
+                                required_decimal(this);
+                            }).change(function(){
+                                var quantity = parseToNumber($(this).val());
+                                var price = parseFloat(parseToDecimal($(this).data("price")));
+                                $(this).closest('tr').find("td.amount").html(quantity*price);
+                            });
+                            var $td_quantity = $('<td></td>').append($quantity);
+                            var $td_sale_price = $('<td></td>').html(n.sale_price);
+                            var $td_amount = $('<td></td>').addClass('amount').html(0);
+
+                            var $textarea = $('<textarea style="height: 30px;min-height: 30px;max-height: 100px;min-width: 100px;max-width: 200px;"></textarea>');
+                            var $td_remark = $('<td></td>').append($textarea);
+                            var $btn_del_tr = $('<button style="button"></button>').html('删除');
+                            $btn_del_tr.click(function () {
+                                $(this).closest('tr').remove();
+                            });
+                            var $td_operators = $('<td></td>').append($btn_del_tr);
+
+                            $tr.append($td_product_name).append($td_item_name).append($td_unit).append($td_stock).append($td_quantity).append($td_sale_price).append($td_amount).append($td_remark).append($td_operators);
+                            $tbody.append($tr);
+                        }
+
+                    });
+
+                    $tbody.find(">tr[data-id]").each(function () {
+                        addCheckedItemId($(this).data('id'));
+                    });
+                    console.log(__checkedRowIds)
+                },
+                grid: {
+                    columns: [
+                        { display: '商品名称', name: 'product_name', width: 130, type: 'text' },
+                        { display: '规格型号', name: 'item_name', width: 130, type: 'text' },
+                        { display: '单位', name: 'unit', width: 60, type: 'text' },
+                        { display: '库存', name: 'quantity', width: 50, type: 'int' },
+                        { display: '单价', name: 'sale_price', width: 80, type: 'currency' }
+                    ],
+                    isScroll: true,
+                    checkbox: true,
+                    width: '95%',
+                    dataAction: 'server', //服务器排序
+                    url:"{:url('shop/product/getJsonGoodsData')}",
+                    parms:params,
+                    onCheckRow: function (checked, row) {
+
+                        if(!checked && findCheckedItemById(row.item_id)>-1){
+                            needClearRows[""+row.item_id] = row;
+                        }
+                    },
+//                    onCheckAllRow: f_onCheckAllRow,
+                    onBeforeShowData: function (data) {
+
+                    }
+//                    ,toolbar: {
+//                        items: [{
+//                            text: '高级自定义查询', click: function () {
+//                            }, icon: 'search2'
+//                        }]
+//                    }
+                }
+            });
+
+            fn();
+        });
+    });
+</script>
+{/block}

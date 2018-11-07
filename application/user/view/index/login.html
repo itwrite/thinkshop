@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{block name="title"}{/block}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="/assets/js/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/js/liger-ui-v1.3.3/lib/ligerUI/skins/Aqua/css/ligerui-all.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/assets/css/common.css">
+
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script src="/assets/js/bootstrap-3.3.5-dist/js/bootstrap.js"></script>
+    <script src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/js/ligerui.all.js"></script>
+
+    <style>
+        .container{
+            margin:0 auto;
+        }
+        #container{
+            margin: 51px auto;
+        }
+    </style>
+</head>
+<body>
+<div id="loading" class="page__bd" style="text-align: center;margin: 10px auto;">
+    <div class="weui-loadmore">
+        <i class="weui-loading"></i>
+        <span class="weui-loadmore__tips">正在加载</span>
+    </div>
+</div>
+
+<div id="container" class="container" style="display: none;">
+    <script>
+        if (window.top.isLayout == true) {
+            window.top.location.reload();
+        }
+    </script>
+    <style type="text/css">
+        body{ font-size:12px;}
+        .l-table-edit {}
+        .l-table-edit-td{ padding:4px;}
+        .l-button-submit,.l-button-reset{width:80px; margin-left:10px; padding-bottom:2px;}
+        .l-verify-tip{ left:230px; top:120px;}
+    </style>
+
+    <div id="target1" style=" margin:3px; display:none;">
+        <form name="form1" method="post" id="form1" style="text-align: center;">
+            <table cellpadding="0" cellspacing="0" class="l-table-edit" >
+                <tr>
+                    <td align="right" class="l-table-edit-td">名字:</td>
+                    <td align="left" class="l-table-edit-td">
+                        <input name="user_login" type="text" id="txtName" ltype="text" value="shop1" />
+                    </td>
+                    <td align="left"></td>
+                </tr>
+                <tr>
+                    <td align="right" class="l-table-edit-td">密码:</td>
+                    <td align="left" class="l-table-edit-td">
+                        <input name="password" type="password" id="txtPassword" ltype="text" value="123456" />
+                    </td>
+                    <td align="left"></td>
+                </tr>
+
+            </table>
+            <br />
+            <input type="submit" value="提交" id="Button1" class="l-button l-button-submit" />
+            <input type="reset" value="重置" class="l-button l-button-reset"/>
+        </form>
+
+    </div>
+
+
+
+    <script type="text/javascript">
+
+        $(function () {
+            $("form").ligerForm();
+            $("#sl1").ligerComboBox();
+            $("#d1").ligerDateEditor();
+            $.ligerDialog.open({ target: $("#target1"),isDrag:false,allowClose:false });
+
+            $("#form1").submit(function (event) {
+                console.log(event);
+                $.post("{:url('api/user/login')}",$(this).serialize(), function (res) {
+                    console.log(res);
+                    if(res.status == 1){
+                        window.location.href = "{:url('user/index/index')}";
+                    }else{
+//                    $.ligerDialog.error(res.msg);
+                        $.ligerDialog.waitting(res.msg); setTimeout(function () { $.ligerDialog.closeWaitting(); }, 2000);
+                    }
+                });
+                return false;
+            });
+        });
+
+    </script>
+</div>
+
+</body>
+</html>
+<script type="text/javascript">
+    $(function ($) {
+        $("#loading").hide();
+        $("#container").show();
+    })
+</script>

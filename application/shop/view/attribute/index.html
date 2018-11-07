@@ -1,0 +1,247 @@
+{extend name="layout" /}
+{block name="center"}
+<div class="btn-group" role="group" aria-label="...">
+    <a href="{:url('shop/category/index')}" class="btn btn-default"><span class="glyphicon glyphicon-arrow-left"></span>&nbsp;返回类目</a>
+    <button id="addAttributeDialog" type="button" class="btn btn-default">添加</button>
+</div>
+
+<table rel="border" cellspacing="0" cellpadding="0" id="list_table">
+    <thead>
+    <tr>
+        <th width="45"><input type="checkbox" role="checkall" data-item="ids"></th>
+        <th width="30">ID</th>
+        <th width="45">必填</th>
+        <th width="45">输入</th>
+        <th width="45">类型</th>
+        <th width="100">排序</th>
+        <th width="*">名称</th>
+        <th width="260">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {if count($list)>0}
+    {volist name='list' id='row'}
+    <tr>
+        <td><input type="checkbox" name="ids[{$row.attribute_id}]" item="ids" value="47"></td>
+        <td>{$row.attribute_id}</td>
+        <td>
+            {if $row['is_require']=='Y'}
+            <input type="checkbox" name="rows[{$row.attribute_id}][is_require]" checked="checked" value="Y">
+            {else}
+            <input type="checkbox" name="rows[{$row.attribute_id}][is_require]" value="Y">
+            {/if}
+        </td>
+        <td>
+            {if $row['is_require']=='Y'}
+            <input type="checkbox" name="rows[{$row.attribute_id}][is_input]" checked="checked" value="Y">
+            {else}
+            <input type="checkbox" name="rows[{$row.attribute_id}][is_input]" value="Y">
+            {/if}
+        </td>
+        <td>
+            {if $row['value_type']=='multiselect'}
+            多选
+            {else}
+            单选
+            {/if}
+        </td>
+        <td>
+            <input type="number" class="form-control" name="rows[{$row.attribute_id}][sort]" value="{$row.sort}"></td>
+
+        <td><input type="text" class="form-control" name="rows[{$row.attribute_id}][attribute_name]" value="{$row.attribute_name}"></td>
+        <td>
+            <a data-id="{$row.attribute_id}" class="btn btn-info btn-sm btn-values-manage">
+                选项管理
+            </a>
+            &nbsp;&nbsp;
+            <a data-id="{$row.attribute_id}" class="btn btn-danger btn-sm btn-delete">
+                删除
+            </a>
+        </td>
+    </tr>
+    {/volist}
+    {else}
+    <tr>
+        <td colspan="8">
+            暂无数据
+        </td>
+    </tr>
+    {/if}
+    </tbody>
+</table>
+
+
+<div style="display: none;">
+    <div id="tempAddAttribute">
+        <form  class="form-inline" method="POST" target="_self">
+            <input type="hidden" name="category_id" value="{$category_id}">
+            <div class="form-group">
+                <table class="table table-bordered table-striped table-attribute-list">
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label><em style="color: red;">*</em>属性名称</label>
+                        </th>
+                        <td>
+                            <input type="text" id="_name" name="attribute_name" required="required"
+                                   class="form-control" placeholder="名称">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label>值类型</label>
+                        </th>
+                        <td>
+                            <select class="form-control" name="value_type">
+                                <option value="singleselect">单选</option>
+                                <option value="multiselect">多选</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label>是否是必填项</label>
+                        </th>
+                        <td><input id="is_require" name="is_require" type="checkbox"
+                                   value="Y"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label>是否可输入</label>
+                        </th>
+                        <td><input id="is_input" name="is_input" type="checkbox"
+                                   value="Y"></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">
+                            <label>值单位</label>
+                        </th>
+                        <td> <input name="value_unit" type="text" class="form-control" style="width:60px"
+                                    value=""></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+
+    <!------->
+    <div id="tempValuesDialog">
+
+        <div class="col-sm-12" style="border-bottom: solid 1px #ebebeb;padding-bottom: 5px;">
+            <div class="input-group">
+                <input id="attribute_id" type="hidden" value="">
+                <input id="value_name" type="text" class="form-control" placeholder="名称" aria-describedby="basic-addon2">
+                <span class="input-group-addon btn-value-add" style="width: 60px;padding: 9px 12px;cursor: pointer;">添加</span>
+            </div>
+        </div>
+        <style>
+            #values .label:not(:first-child){
+                margin-left: 5px;
+            }
+        </style>
+        <div class="col-sm-12" id="values" style="padding: 5px;">
+
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    var subWindow = window;
+    $("#addAttributeDialog").click(function(){
+        var $target = $("#tempAddAttribute").clone().removeAttr('id');
+        $target.find("form").submit(function () {
+            var formData = $(this).serialize();
+            $.post("{:url('shop/attribute/doAdd')}",formData, function (res) {
+
+                console.log(res);
+                _dialog.hide();
+                if(res.code==1){
+                    window.location.reload();
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+
+            });
+            return false;
+        });
+        var _dialog = window.top.$.ligerDialog.open({title:"属性添加", target: $target,isDrag:false,allowClose:true,width:400,buttons:[
+            {
+                text:"ok",
+                onclick:function(item,dialog){
+                    $target.find("form").submit();
+                }
+            }
+        ] });
+    });
+
+    $("#list_table").on("click",'.btn-delete',function(){
+        var attribute_id = $(this).data('id');
+        if(confirm("确定删除？")){
+            $.post("{:url('shop/attribute/doDelete')}",{attribute_id:attribute_id}, function (res) {
+                console.log(res);
+                if(res.code==1){
+                    window.location.reload();
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+            });
+        }
+
+    });
+
+    /**
+     *
+     */
+    $("#list_table").on("click",".btn-values-manage",function(){
+        var attribute_id = $(this).data('id');
+        var $target = $("#tempValuesDialog").clone().removeAttr('id');
+        function displayValues(){
+            $.get("{:url('shop/AttributeValue/getJsonData')}",{attribute_id:attribute_id}, function (res) {
+                if(res.code ==1){
+                    $target.find("#values").html('');
+                    $.each(res.data.values, function (i, n) {
+//                        console.log(n)
+                        var $label = $('<span class="label label-warning"></span>').css({display:"inline-block",position:"relative",padding:"8px 15px"}).html(n.attribute_value);
+                        var $del_btn = $('<a class="l-dialog-winbtn l-dialog-close"></a>').data('attribute_value_id', n.attribute_value_id).css({position:"absolute",top:0,right:-5});
+                        $del_btn.click(function () {
+                            var attribute_value_id = $(this).data('attribute_value_id');
+                            if(confirm("确定删除？")){
+                                $.post("{:url('shop/AttributeValue/doDelete')}",{attribute_value_id:attribute_value_id}, function (resData) {
+                                    if(resData.code==1){
+                                        displayValues();
+                                    }
+                                });
+                            }
+                        });
+                        $label.append($del_btn)
+                        $target.find("#values").append($label)
+                    });
+
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+            });
+        }
+        displayValues();
+        $target.find(".btn-value-add").click(function () {
+            var value_name = $target.find("#value_name").val();
+            $.post("{:url('shop/AttributeValue/doAdd')}",{attribute_id:attribute_id,value_name:value_name}, function (res) {
+                if(res.code==1){
+                    displayValues();
+                }
+            })
+        });
+
+        var _dialog = window.top.$.ligerDialog.open({ target: $target,isDrag:false,allowClose:true,width:400,buttons:[
+            {
+                text:"ok",
+                onclick:function(item,dialog){
+                    _dialog.hide();
+                }
+            }
+        ] });
+    });
+</script>
+{/block}

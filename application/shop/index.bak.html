@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <base target="center"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Fonts -->
+
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="http://cdn.bootcss.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+    <script src="http://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link href="/favicon.ico" rel="shortcut icon"/>
+    <link href="assets/js/layout/layout.all.css" rel="stylesheet"/>
+
+    <!-- ============== Jquery ============== -->
+    <script src="assets/js/jquery-1.11.1.min.js"></script>
+
+    <!-- ============== Jquery UI Dialog ============== -->
+    <link href="assets/js/jquery-ui-1.11.4.custom/jquery-ui.css" rel="stylesheet"/>
+    <script src="assets/js/jquery-ui-1.11.4.custom/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="assets/js/common.js"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            window.top.$dialog = $('<div></div>').hide();
+            window.top.$dialog.appendTo('body');
+            window.top.$dialog.dialog({
+                title: "信息",
+                autoOpen: false,
+                hasClose: true,
+                resizable: false,
+                draggable: false,
+                minWidth: 250,
+                modal: true,
+                buttons: {
+                    "OK": function () {
+                        $(this).dialog("close");
+                    }
+                }
+            });
+            //
+            $("button,input[type='button'],input[type='submit'],a[role='button']").button();
+        });
+    </script>
+    <!-- =============== Jquery UI Dialog end============= -->
+
+
+    <script src="assets/js/layout/layout.js"></script>
+    <script type="text/javascript">
+
+        window.top.home = true;
+        $("#loader").show();
+        $(function () {
+            $("#tree").ligerTree({
+                checkbox: false,
+                data: eval(''),
+                nodeWidth: "auto",
+                idFieldName:'id',
+//                parentIDFieldName :'parent_id',
+                onSelect: function (node) {
+                    if (node.data.status == 'unavailable') {
+                        alert("Sorry!! This menu is disabled.")
+                        return false;
+                    }
+                    if (node.data.children) return;
+                    var tabid = $(node.target).attr("tabid");
+                    if (!tabid) {
+                        tabid = node.data.id;
+                        $(node.target).attr("tabid", node.data.id);
+                    }
+                    $.menuToCenter(tabid, node.data.text, node.data.url, 7);
+                }
+            });
+            window.top.ligerTree = $("#tree").ligerGetTreeManager();
+            window.top.ligerTree.clear();
+            window.top.ligerTree.loadData(null, "{:url('api/ShopMenu/index')}", null);
+
+            window.top.$loader = $("#loader");
+            window.top.$loader.hide();
+            //
+            $('#home').attr('src', "{:url('index/home')}");
+        });
+    </script>
+
+    <!-- =============== Logout ============= -->
+    <script src="assets/js/cookie.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            var $a_text = $('<span class="ui-button-text" style="padding: .1em .6em;font-size: .8em;">退出</span>');
+            var $logout_btn = $('<a></a>').append($a_text).addClass('ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only').attr({href:"/ThinkShop/public/index.php/shop/admin/do_logout.html",role:"button"});
+            $(".layout-panel-center .panel-header .panel-tool").html('').append($logout_btn);
+            $('#logout').click(function (event) {
+                event.preventDefault();
+                set_cookie('token', '', -1);
+                window.document.location.reload();
+            });
+        });
+    </script>
+    <!-- =============== Logout end ============= -->
+    <style type="text/css">
+        body {font-size: 62.5%;}
+        body > div, .ui-widget {font-size: 1.4em;}
+        .fixed {position: fixed;}
+        .ajax-loader {
+            position: absolute;
+            top: 0;
+            width: 99%;
+            height: 100%;
+            z-index: 999;
+        }
+        .ajax-loader .ui-widget-content {
+            left: 45%;
+            top: 25%;
+            padding: 10px;
+            background: #fff;
+        }
+
+        div[region='north'] {
+            /*height: 32px;*/
+            text-align: left;
+            background: #FFFFFF;
+            position: relative;
+        }
+
+        div[region='west'] {
+            width: 180px;
+        }
+
+        div[region='south'] {
+            height: 20px;
+            background: #e5edef;
+            text-align: center;
+            padding-top: 10px;
+        }
+
+        div[region='center'] > div {
+            margin: 2px 5px;
+        }
+
+        iframe {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
+            overflow: auto;
+            padding: 0;
+        }
+
+        #logo {
+            position: absolute;
+            left: 20px;
+            top: 10px;
+        }
+
+        #logo img {
+            height: 60px;
+            width: 253px;
+            float: left;
+        }
+
+        .ui-buttonset .ui-button .ui-button-text{
+            padding: .3em .6em;
+            font-size: .9em;
+        }
+    </style>
+</head>
+<body class="easyui-layout">
+<!-------------------------------------------------------------->
+<div id="loader" class="ui-overlay ajax-loader" style="width: auto;">
+    <div class="ui-widget-overlay fixed">
+    </div>
+    <div class="ui-widget ui-widget-content ui-corner-all fixed">
+        <div class="content-text" style=""><img src="assets/js/layout/loading.gif"/></div>
+    </div>
+</div>
+<!-------------------------------------------------------------->
+<!-- header -->
+<div region="north" border="false" resize=false id="top" class="relative">
+    <!--<a id="logo" href="{:url('admin/index/index')}" title="Home" target="_blank">-->
+        <!--<img src="assets/js/layout/loading.gif"/>-->
+    <!--</a>-->
+   <div class="ui-buttonset" style="position:absolute;bottom: 2px;right:2px;top:0;">
+       <a  href="{:url('admin/do_logout')}" role="button">退出</a>
+   </div>
+</div>
+<!-- header -->
+<!-- left -->
+<div region="west" split="true" title="&nbsp;昵称:&nbsp;">
+    <ul id="tree" class="tree" style="margin:3px;">
+
+    </ul>
+</div>
+<!-- left -->
+
+<!-- right -->
+<div region="center" title="&nbsp;Home">
+    <div>
+        <iframe id="home" name="center" frameborder="0" scrolling="yes"></iframe>
+    </div>
+</div>
+<!-- right -->
+
+<!-- footer -->
+<div region="south" border="true" split="false">
+    Copyright
+</div>
+<!-- footer -->
+</body>
+</html>

@@ -1,0 +1,237 @@
+{extend name="layout" /}
+{block name="center"}
+<script>
+    function parseToDecimal(val){
+        var has_dot = false;
+        var arr = [];
+        for(var i=0;i<val.length;i++){
+            if('0123456789.'.indexOf(val[i])>-1){
+                if(val[i]=='.'){
+                    if(has_dot==false){
+                        arr.push(val[i]);
+                        has_dot = true;
+                    }
+                }else{
+                    arr.push(val[i]);
+                }
+            }
+        }
+        var new_val = arr.join('');
+        if(/^[0][0-9]+(\.?[0-9])*$/g.test(new_val)){
+            return parseFloat(new_val);
+        }
+        return arr.length>0?new_val:0;
+    }
+    function parseToNumber(val){
+        return parseInt(parseToDecimal(val));
+    }
+</script>
+<style>
+    table>tbody>tr>td,.table>tbody>tr>td, .table>tbody>tr>th, .table>tfoot>tr>td, .table>tfoot>tr>th, .table>thead>tr>td, .table>thead>tr>th{
+        vertical-align: middle;
+    }
+    .product-items th{
+        font-weight: 600;
+    }
+    .product-items th,.product-items td{
+        padding: 5px;
+    }
+    /*.product-items tbody tr:not(:last-child)>td:first-child{*/
+        /*border-bottom: 1px solid #ddd8ce;*/
+    /*}*/
+    .product-items thead tr:nth-child(2)>th:not(:first-child),.product-items tbody tr>td{
+        background-color: #ddd8ce;
+        border-top: 1px solid #FFFFFF;
+    }
+</style>
+<div class="col-md-12">
+    <form class="form-inline" method="post" action="{:url('shop/product/index')}">
+        <table rel="border" cellspacing="0" cellpadding="0">
+            <thead>
+            <tr>
+                <th colspan="2">
+                    搜索
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td class="t-label">
+                    关键字
+                </td>
+                <td>
+                    <div class="col-lg-6">
+                        <div class="input-group">
+                            <input type="text" class="form-control" name="keywords" placeholder="请输入关键字">
+                            <div class="input-group-btn">
+                                <button type="submit" class="btn btn-add btn-primary">查找</button>
+                            </div>
+                        </div><!-- /input-group -->
+                    </div><!-- /.col-lg-6 -->
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+<div class="col-md-12">
+    <div class="pt10">
+            <span class="pagination">
+                {$pagination}
+            </span>
+        <a href="{:url('shop/product/add1')}" class="btn btn-success hide">添加</a>
+    </div>
+
+    <table class="table table-bordered table-hover">
+        <thead>
+        <th width="50"><span>ID</span></th>
+        <th width="200"><span>名称</span></th>
+        <th width="120"><span>类目</span></th>
+        <th width="*"><span>总库存/一口价格</span></th>
+        <th width="120">状态</th>
+        <th ><span>操作</span></th>
+        </thead>
+        <tbody>
+        {foreach $list as $key=>$vo}
+            <tr data-val-id="{$vo.product_id}">
+                <td>
+                    <span>{$vo.product_id}</span>
+                </td>
+                <td>
+                    <span>{$vo.product_name}</span>
+                </td>
+
+                <td>
+                    <span>{$vo.category_name}</span>
+                </td>
+                <td>
+                    <form class="stock-form">
+                        <input type="hidden" name="product_id" value="{$vo.product_id}">
+                        <table class="product-items">
+                            <thead>
+                            <tr>
+                                <th><span class="up-and-down glyphicon glyphicon-chevron-down" style="cursor: pointer;"></span></th>
+                                <th>库存</th>
+                                <th>价格<span type="submit" class="label label-primary stock-update" style="cursor: pointer;float: right;display: none;">更新</span></th>
+                            </tr>
+                            </thead>
+                            <tbody style="display: none;">
+                            {foreach $vo.items as $i=>$item}
+                            <tr>
+                                <td>{$item.item_name}</td>
+                                <td>
+                                    <input type="number" min="0" class="quantity" name="items[{$item.item_id}][quantity]" value="{$item.quantity}" style="width:45px;" onKeyup="this.value = parseToNumber(this.value);">
+                                    <!--<span class="label label-default">{$item.quantity}</span>-->
+                                </td>
+                                <td>
+                                    <input type="number" min="0" class="sale_price" name="items[{$item.item_id}][sale_price]" value="{$item.sale_price}" style="width:85px;" onKeyup="this.value = parseToDecimal(this.value);">
+                                    <!--<span class="label label-warning">￥{$item.sale_price}</span>-->
+                                </td>
+                            </tr>
+                            {/foreach}
+                            </tbody>
+                        </table>
+                    </form>
+                </td>
+                <td>
+
+                    {if $vo.is_on_sale=='Y' }
+                        <button class="btn btn-success btn-sm toggle_on_sale" data-id="{$vo.product_id}">
+                            <i class="glyphicon glyphicon-ok-circle"></i>
+                            <span class="text">已上架</span>
+                        </button>
+                        {else/}
+                        <button class="btn btn-warning btn-sm toggle_on_sale" data-id="{$vo.product_id}">
+                            <i class="glyphicon glyphicon-ban-circle"></i>
+                            <span class="text">已下架</span>
+                        </button>
+                    {/if}
+                </td>
+                <td>
+                    <!--<a class="btn btn-info btn-sm" data-id="{$vo.product_id}" href="{:url('shop/product/detail', array('product_id'=>$vo['product_id']))}">详情</a>-->
+
+                    {if $vo.is_on_sale=='N' }
+                    <!--<a class="btn btn-info btn-sm edit" data-id="{$vo.product_id}" href="{:url('shop/product/edit', array('product_id'=>$vo['product_id']))}">编缉</a>-->
+                    {/if}
+                </td>
+            </tr>
+
+        {/foreach}
+        </tbody>
+    </table>
+
+    <div>
+            <span class="pagination">
+                {$pagination}
+            </span>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $(".toggle_on_sale").click(function () {
+            var that =this;
+            event.preventDefault();
+            var url = "{:url('shop/product/toggleOnSale')}";
+            var _id = $(that).data('id');
+
+            $.ajax({
+                url: url,
+                type:"POST",
+                data: {"product_id": _id},
+                success: function (response) {
+                    window.top.$.ligerDialog.warn(response.msg);
+                    if (1 == response.code) {
+                        if($(that).hasClass('btn-success')){
+                            $(that).removeClass('btn-success').addClass('btn-warning');
+                            $(that).find('.glyphicon').removeClass('glyphicon-ok-circle').addClass('glyphicon-ban-circle');
+//                            var url = "{:url('shop/product/edit')}&product_id="+_id;
+//                            var $edit = $('<a></a>').addClass("btn btn-info btn-sm edit").attr({"data-id":_id,href:url}).html('编缉');
+//                            $(that).closest('tr').find(">td:last-child").append($edit);
+                        }else{
+                            $(that).addClass('btn-success').removeClass('btn-warning');
+                            $(that).find('.glyphicon').addClass('glyphicon-ok-circle').removeClass('glyphicon-ban-circle');
+                            $(that).closest('tr').find(".edit").remove();
+                        }
+                        $(that).find(".text").html((response.data.is_on_sale=='Y'?"已上架":"已下架"));
+                    }
+                }
+            });
+            return false;
+        });
+    });
+</script>
+{/block}
+{block name="script"}
+    <script>
+        $(function () {
+            $(".stock-form").submit(function () {
+                var that = this;
+                var formData = $(that).serializeArray();
+                console.log(formData);
+
+                $.post("{:url('shop/product/doItemUpdate')}",formData, function (res) {
+                    window.top.$.ligerDialog.warn(res.msg);
+                    if(res.code==1){
+                        $(that).find(".total").html(res.data.total);
+                    }
+                });
+                return false;
+            });
+           $(".stock-update").click(function () {
+               $(this).closest("form").submit();
+           });
+            $(".up-and-down").click(function () {
+                if($(this).hasClass('glyphicon-chevron-down')){
+                    $(this).removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+                    $(this).closest("table").find("tbody").show();
+                    $(this).closest("table").find(".stock-update").show();
+                }else{
+                    $(this).removeClass("glyphicon-chevron-up").addClass("glyphicon-chevron-down");
+                    $(this).closest("table").find("tbody").hide();
+                    $(this).closest("table").find(".stock-update").hide();
+                }
+            });
+        });
+    </script>
+{/block}

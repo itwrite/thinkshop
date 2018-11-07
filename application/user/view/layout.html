@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>{block name="title"}{/block}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link rel="stylesheet" href="/assets/js/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/assets/js/liger-ui-v1.3.3/lib/ligerUI/skins/Aqua/css/ligerui-all.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="/assets/css/common.css">
+
+    <script src="/assets/js/jquery-1.11.1.min.js"></script>
+    <script src="/assets/js/bootstrap-3.3.5-dist/js/bootstrap.js"></script>
+    <script src="/assets/js/liger-ui-v1.3.3/lib/ligerUI/js/ligerui.all.js"></script>
+
+    <style>
+        .container{
+            margin:0 auto;
+        }
+        #container{
+            margin: 51px auto;
+        }
+    </style>
+</head>
+<body>
+<div id="loading" class="page__bd" style="text-align: center;margin: 10px auto;">
+    <div class="weui-loadmore">
+        <i class="weui-loading"></i>
+        <span class="weui-loadmore__tips">正在加载</span>
+    </div>
+</div>
+{block name="header"}
+<header class="navbar navbar-static-top bs-docs-nav navbar-fixed-top" role="banner">
+    <div class="container" style="border-bottom: 1px solid #dddddd;">
+        <div class="navbar-header">
+            <a href="{:url('index/index')}" class="navbar-brand">首页</a>
+        </div>
+        <ul class="nav navbar-nav navbar-right">
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">我的 <span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a href="{:url('user/reset_password')}">修改密码</a></li>
+                    <li role="separator" class="divider"></li>
+                    <li><a href="{:url('user/do_logout')}">退出</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</header>
+{/block}
+<div id="container" class="container" style="display: none;">
+    <table style="width: 100%;">
+        <tbody>
+        <tr>
+            <td style="width: 200px;vertical-align: top;padding: 5px 0;">
+                {block name="sidebar"}
+                <link href="/assets/css/bootstrap-tree.css" rel="stylesheet"/>
+                <div class="b-tree table-bordered">
+                    <ul>
+                        {if count($shop_list)>0}
+                        <li>
+                            <span><i class="icon-minus-sign"></i>我拥有的店铺</span>
+                            <ul>
+                                {foreach $shop_list as $i=>$row}
+                                <li>
+                                    <a href="{:url('shop/index/doAuthorizeToUser')}?shop_id={$row['shop_id']}" target="_blank"><span>{$row['shop_name']}</span></a>
+                                </li>
+                                {/foreach}
+                            </ul>
+                        </li>
+                        {/if}
+                        {if count($shop_list2)>0}
+                        <li>
+                            <span><i class="icon-minus-sign"></i>我服务的店铺</span>
+                            <ul>
+                                {foreach $shop_list2 as $i=>$row}
+                                <li>
+                                    <a href="{:url('shop/index/doAuthorizeToUser')}?shop_id={$row['shop_id']}" target="_blank"><span>{$row['shop_name']}</span></a>
+                                </li>
+                                {/foreach}
+                            </ul>
+                        </li>
+                        {/if}
+                    </ul>
+                </div>
+                <script type="text/javascript">
+                    $(function () {
+                        $('.b-tree li:has(ul)').addClass('parent').find(' > span').attr('title', 'Collapse this branch');
+                        $('.b-tree li.parent > span').on('click', function (e) {
+                            var children = $(this).parent('li.parent').find(' > ul > li');
+                            if (children.is(":visible")) {
+                                children.hide('fast');
+                                $(this).attr('title', '展开').find(' > i').addClass('icon-plus-sign').removeClass('icon-minus-sign');
+                            } else {
+                                children.show('fast');
+                                $(this).attr('title', '收起').find(' > i').addClass('icon-minus-sign').removeClass('icon-plus-sign');
+                            }
+                            e.stopPropagation();
+                        });
+                    });
+                </script>
+                {/block}
+            </td>
+            <td>
+                {block name="center"}{/block}
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+{block name="footer"}
+<footer class="navbar navbar-static-top bs-docs-nav navbar-fixed-bottom" role="banner">
+    <div class="container" style="display: none;">
+        <div class="navbar-header">
+            <a href="/" class="navbar-brand">首页</a>
+        </div>
+        <nav id="bs-navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li>
+                    <a href="../getting-started/">起步</a>
+                </li>
+                <li>
+                    <a href="../css/" >全局 CSS 样式</a>
+                </li>
+                <li class="active">
+                    <a href="../components/">组件</a>
+                </li>
+                <li>
+                    <a href="../javascript/" >JavaScript 插件</a>
+                </li>
+                <li>
+                    <a href="../customize/">定制</a>
+                </li>
+                <li><a href="http://expo.bootcss.com" target="_blank">网站实例</a></li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="http://www.bootcss.com/" target="_blank">Bootstrap中文网</a></li>
+            </ul>
+        </nav>
+    </div>
+</footer>
+{/block}
+
+{block name="script"}{/block}
+
+</body>
+</html>
+<script type="text/javascript">
+    $(function ($) {
+        $("#loading").hide();
+        $("#container").show();
+    })
+</script>

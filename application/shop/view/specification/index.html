@@ -1,0 +1,191 @@
+{extend name="layout" /}
+{block name="center"}
+<form  method="post" action="{:url('shop/specification/doUpdate')}">
+<div class="btn-group" role="group" aria-label="...">
+    <button type="submit" class="btn btn-warning btn-sm">更新</button>
+    <button type="button" class="btn btn-default btn-sm addSpecificationDialog">添加</button>
+</div>
+
+<table rel="border" cellspacing="0" cellpadding="0" id="list_table">
+    <thead>
+    <tr>
+        <th width="45"><input type="checkbox" role="checkall" data-item="ids"></th>
+        <th width="30">ID</th>
+        <th width="*">名称</th>
+        <th width="260">操作</th>
+    </tr>
+    </thead>
+    <tbody>
+    {if count($list)}
+    {volist name='list' id='row'}
+    <tr>
+        <td><input type="checkbox" name="ids[{$row.specification_id}]" item="ids" value="47"></td>
+        <td>{$row.specification_id}</td>
+        <td>
+            <input type="text" class="form-control" name="rows[{$row.specification_id}][specification_name]" value="{$row.specification_name}">
+        </td>
+        <td>
+            <a data-id="{$row.specification_id}" class="btn btn-info btn-sm btn-values-manage">
+                选项管理
+            </a>
+            &nbsp;&nbsp;
+            <a data-id="{$row.specification_id}" class="btn btn-danger btn-sm btn-delete">
+                删除
+            </a>
+        </td>
+    </tr>
+    {/volist}
+    {else}
+    <tr>
+        <td colspan="8">
+            暂无数据
+        </td>
+    </tr>
+    {/if}
+    </tbody>
+</table>
+    <div class="btn-group" role="group" aria-label="...">
+        <button type="submit" class="btn btn-warning btn-sm">更新</button>
+    </div>
+</form>
+<div style="display: none;">
+    <div id="tempAddSpecification">
+        <form  class="form-inline" method="POST" target="_self">
+            <div class="form-group">
+                <table class="table table-bordered table-striped table-specification-list">
+                    <tbody>
+                    <tr>
+                        <th scope="row">
+                            <label><em style="color: red;">*</em>规格名称</label>
+                        </th>
+                        <td>
+                            <input type="text" id="_name" name="specification_name" required="required"
+                                   class="form-control" placeholder="名称">
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </div>
+
+    <!------->
+    <div id="tempValuesDialog">
+
+        <div class="col-sm-12" style="border-bottom: solid 1px #ebebeb;padding-bottom: 5px;">
+            <div class="input-group">
+                <input id="specification_id" type="hidden" value="">
+                <input id="value_name" type="text" class="form-control" placeholder="名称" aria-describedby="basic-addon2">
+                <span class="input-group-addon btn-value-add" style="width: 60px;padding: 9px 12px;cursor: pointer;">添加</span>
+            </div>
+        </div>
+        <style>
+            #values .label:not(:first-child){
+                margin-left: 5px;
+            }
+        </style>
+        <div class="col-sm-12" id="values" style="padding: 5px;">
+
+        </div>
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+    var subWindow = window;
+    $(".addSpecificationDialog").click(function(){
+        var $target = $("#tempAddSpecification").clone().removeAttr('id');
+        $target.find("form").submit(function () {
+            var formData = $(this).serialize();
+            $.post("{:url('shop/specification/doAdd')}",formData, function (res) {
+
+                console.log(res);
+                _dialog.hide();
+                if(res.code==1){
+                    window.location.reload();
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+
+            });
+            return false;
+        });
+        var _dialog = window.top.$.ligerDialog.open({title:"规格添加", target: $target,isDrag:false,allowClose:true,width:400,buttons:[
+            {
+                text:"ok",
+                onclick:function(item,dialog){
+                    $target.find("form").submit();
+                }
+            }
+        ] });
+    });
+
+    $("#list_table").on("click",'.btn-delete',function(){
+        var specification_id = $(this).data('id');
+        if(confirm("确定删除？")){
+            $.post("{:url('shop/specification/doDelete')}",{specification_id:specification_id}, function (res) {
+                console.log(res);
+                if(res.code==1){
+                    window.location.reload();
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+            });
+        }
+
+    });
+
+    /**
+     *
+     */
+    $("#list_table").on("click",".btn-values-manage",function(){
+        var specification_id = $(this).data('id');
+        var $target = $("#tempValuesDialog").clone().removeAttr('id');
+        function displayValues(){
+            $.get("{:url('shop/SpecificationValue/getJsonData')}",{specification_id:specification_id}, function (res) {
+                if(res.code ==1){
+                    $target.find("#values").html('');
+                    $.each(res.data.values, function (i, n) {
+//                        console.log(n)
+                        var $label = $('<span class="label label-warning"></span>').css({display:"inline-block",position:"relative",padding:"8px 15px"}).html(n.specification_value);
+                        var $del_btn = $('<a class="l-dialog-winbtn l-dialog-close"></a>').data('specification_value_id', n.specification_value_id).css({position:"absolute",top:0,right:-5});
+                        $del_btn.click(function () {
+                            var specification_value_id = $(this).data('specification_value_id');
+                            if(confirm("确定删除？")){
+                                $.post("{:url('shop/SpecificationValue/doDelete')}",{specification_value_id:specification_value_id}, function (resData) {
+                                    if(resData.code==1){
+                                        displayValues();
+                                    }
+                                });
+                            }
+                        });
+                        $label.append($del_btn)
+                        $target.find("#values").append($label)
+                    });
+
+                }else{
+                    window.top.$.ligerDialog.alert(res.msg)
+                }
+            });
+        }
+        displayValues();
+        $target.find(".btn-value-add").click(function () {
+            var value_name = $target.find("#value_name").val();
+            $.post("{:url('shop/SpecificationValue/doAdd')}",{specification_id:specification_id,value_name:value_name}, function (res) {
+                if(res.code==1){
+                    displayValues();
+                }
+            })
+        });
+
+        var _dialog = window.top.$.ligerDialog.open({ target: $target,isDrag:false,allowClose:true,width:400,buttons:[
+            {
+                text:"ok",
+                onclick:function(item,dialog){
+                    _dialog.hide();
+                }
+            }
+        ] });
+    });
+</script>
+{/block}

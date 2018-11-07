@@ -1,0 +1,558 @@
+{extend name="layout" /}
+{block name="center"}
+<!-- ========================================== -->
+<script src="/assets/js/croppic/croppic.js"></script>
+<link rel="stylesheet" href="/assets/js/croppic/css/croppic.css">
+<link rel="stylesheet" href="/assets/js/bootstrap-3.3.5-dist/css/bootstrap.min.css">
+
+<script type="text/javascript" src="/assets/js/bootstrap-3.3.5-dist/js/bootstrap.min.js"></script>
+<style>
+    .container {
+        padding-right: 15px;
+        padding-top: 15px;
+        padding-left: 0;
+        margin-right: auto;
+        margin-left: 15px;
+    }
+    .image-box{
+        border: 2px transparent solid;
+        cursor: pointer;
+        /*overflow: hidden;*/
+        min-width: 100px;
+        /*min-height: 100px;*/
+        width: 80px;
+        /*height: 100px;*/
+        display: inline-table;
+        text-align: center;
+        padding-top: 20px;
+    }
+    .image-box:hover{
+        border: 2px #f0ad4e solid;
+    }
+    .image-box p{
+        margin: 2px;
+        padding: 5px;
+        font-size: 12px;
+    }
+    .image-box label{
+        cursor: pointer;
+    }
+    .image-box,.image-box a{
+        text-decoration: none;
+        display: inline-table;
+    }
+
+    .image-box .operate {
+        color: #FFFFFF;
+        padding: 2px;
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 5;
+        width: 100%;
+    }
+
+    .image-box:hover .operate{
+        display: block;
+    }
+    .image-box .operate .btn-edit{
+        font-size: 10px;
+    }
+    .image-box .operate .glyphicon{
+        top:0;
+        cursor: pointer;
+        font-size: 1.2rem;
+        margin-top: 1px;
+    }
+
+    .image-box .operate .glyphicon.glyphicon-remove{
+        background: rgba(47, 47, 47, .3);
+        border-radius: 50%;
+        font-size: 1.4rem;
+    }
+
+    .image-box.active{
+        border: 2px green solid;
+    }
+
+    #up_progress{
+        display: none;
+    }
+    #up_progress.processing{
+        display: block;
+    }
+    #up_progress .progress{
+        margin: 0;
+    }
+    #up_group_buttons{
+        margin-bottom: 10px;
+    }
+    #asset_picture_list{
+        border: solid 1px #ddd;
+        padding: 2px;
+        min-height: 100px;
+        margin-top: -1px;
+    }
+    #ui-path-links{
+        margin-top: -1px;
+        margin-left: -1px;
+    }
+</style>
+<div id="croppic" class="hide">
+
+</div>
+
+<div id="up_group_buttons" class="mt10 mb10" data-folder-id="0">
+    <button type="button" class="btn btn-default btn-sm btn-back-pull-files" style="display: none;">返回</button>
+    <button type="button" class="btn btn-info btn-sm btn-new-folder" data-toggle="modal" data-target="#newFolderDialog">新建文件夹</button>
+    <button id="cropContainerHeaderButton" type="button" class="btn btn-success btn-sm btn-new-file relative">
+        上传图片
+        <span id="up_progress" class="absolute" style="width:100%;left:0" >
+            <div class="progress">
+                <div class="progress-bar" role="progressbar" style="width: 0%;">
+                    <span class="sr-only">0% Complete</span>
+                </div>
+            </div>
+        </span>
+    </button>
+    <button type="button" class="btn btn-info btn-sm btn-batch-move" disabled="disabled">移动选中项</button>
+    <input id="up_file" type="file" class="hide"><br/>
+    <em><mark style="color:#888;font-size: 12px;">（双击文件夹名称可进入重命名模式。<small>注：目前只传640x400尺寸</small>）</mark></em>
+</div>
+<div style="border: 1px solid #DDD;border-bottom: 0;">
+    <div id="ui-path-links">
+
+    </div>
+    <div class="clearfix"></div>
+</div>
+<div id="asset_picture_list">
+
+</div>
+
+<!-- ================================== -->
+<!-- Modal -->
+<div class="modal fade modal-assets-dialog" id="newFolderDialog" data-folder-id="0" tabindex="-1" role="dialog" aria-labelledby="newFolderLabel" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="newFolderLabel">
+                    新建文件夹
+                </h4>
+            </div>
+            <div class="modal-body" style="min-height: 80px;">
+                <input type="text" class="form-control" id="folder_name">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm submit-new-folder">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ================================== -->
+<!-- Modal -->
+<div class="modal fade modal-assets-dialog" id="folderTreeDialog" data-folder-id="0" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">
+                    请选择文件夹
+                </h4>
+            </div>
+            <div class="modal-body" style="min-height: 80px;">
+                <ul id="tree">
+
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-sm btn-submit-edit" data-folder-ids="0" data-picture-ids="0">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block}
+
+{block name="script"}
+<script type="text/javascript">
+    var key_prefix = "f_";
+    var __folder_path_cache_data = {};
+    __folder_path_cache_data[key_prefix+0]={
+        id:0,
+        name:"根目录"
+    };
+
+    function folder_path_cache_set(folder_id,data){
+        __folder_path_cache_data[key_prefix+folder_id]=data;
+        console.info('__folder_path_cache_data',__folder_path_cache_data);
+    }
+
+    function folder_path_cache_remove(folder_id){
+        delete __folder_path_cache_data[key_prefix+folder_id];
+    }
+
+    /**
+     * 得到路径
+     */
+    function get_full_path(){
+        var arr = [];
+        for(var i in __folder_path_cache_data){
+            var obj = __folder_path_cache_data[i];
+            arr.push(obj.name);
+        }
+        return arr.join("/");
+    }
+
+    function get_full_path_$html(){
+        var $ul = $('<ul></ul>').addClass('ui-path').css({width:"100%"});
+        var z_index = 100;
+        for(var key in __folder_path_cache_data){
+
+            var obj = __folder_path_cache_data[key];
+            var $li = $('<li></li>').addClass('ui-path-item');
+            if(obj.id==0){
+                $li.addClass('first');
+            }
+            var $a = $('<a></a>').css({"z-index":z_index}).attr({title:obj.name,href:"javascript:void(0);","data-folder-id":obj.id}).click(function () {
+                var index = $(this).closest('li').index();
+                var j = 0;
+                for(var k in __folder_path_cache_data){
+                    if(j>index){
+                        delete __folder_path_cache_data[k];
+                    }
+                    j++;
+                }
+                var folder_id = $(this).data('folder-id');
+                display_pictures_and_folders(folder_id);
+            });
+            $li.append($a);
+            var $name = $('<span></span>').html(obj.name);
+            $a.append($name);
+
+            $ul.append($li);
+            z_index--;
+        }
+        return $ul;
+    }
+
+    /**
+     *
+     */
+    function batch_move_check(){
+        $(".btn-batch-move").removeAttr('disabled');
+        return true;
+
+        var $checked = $("#asset_picture_list input[type='checkbox']:checked");
+        if($checked.length>0){
+            $(".btn-batch-move").removeAttr('disabled');
+        }else{
+            $(".btn-batch-move").attr('disabled',true);
+        }
+    }
+
+    function display_pictures_and_folders(folder_id,callback){
+
+        $("#up_group_buttons").data({"folder-id":folder_id});
+        var url = "{:url('Asset/picture/pull_files')}";
+        $.getJSON(url,{folder_id:folder_id}, function (response) {
+//            console.info('callback:',callback);
+            if(typeof callback=='function'){
+                callback.call(this,response);
+            }
+            /**
+             *
+             */
+//            console.info("pictures",response);
+            if(response.status==1){
+
+                if(response.folder_id>0){
+                    $(".btn-back-pull-files").data({"folder-id":response.parent_id,"old-id":response.folder_id});//.show();//有路径可直接返回对庆的目录
+                }else{
+                    $(".btn-back-pull-files").removeAttr("data-folder-id").hide();
+                }
+                $(".folder_path").html(get_full_path());
+                //
+                $("#ui-path-links").html('').append(get_full_path_$html());
+
+                $("#asset_picture_list").html('');
+                $.each(response.data, function (i, n) {
+                    var $container = $('<span></span>').attr({"data-index":i,title: n.owner_name}).addClass('relative image-box');
+                    var $a =  $('<label></label>').attr({"data-index":i,for:"item_checkbox_"+i});
+                    var $img = $('<img/>').attr({src: n.url,alt:""}).css({width:"100%"});
+                    var $a_remove = $('<a class="glyphicon glyphicon-remove pull-right"></a>');
+                    var $name = $('<p></p>').html("&nbsp;");
+                    var $checkbox = $('<input/>').attr({type:'checkbox',id:"item_checkbox_"+i}).addClass('pull-right');
+                    var $footer = $('<div></div>').append($checkbox);
+
+                    var $a_edit = $('<span class="btn btn-default btn-sm btn-edit pull-left"></span>').html('<i class="glyphicon glyphicon-edit pull-left"></i>移动');
+
+                    var $operate = $('<div class="operate"></div>')
+                            .append($a_remove)
+                            .append($a_edit);
+
+                    $container.append($a);
+                    $container.append($name);
+                    if(n.is_dir==true){
+                        $container.addClass("folder");
+                        $a_remove.attr({"data-id": n.folder_id});
+                        $name.attr({title:n.name,"data-id": n.folder_id}).html(n.name).dblclick(function () {
+                            $(this).attr({contenteditable:true}).focus();
+                        }).blur(function () {
+                            var self = this;
+                            var text = $(self).text();
+                            var id = $(self).data('id');
+                            if($.trim(text)==""){
+                                $(self).text($(self).attr("title"));
+                                alert("不能为空");
+                                $(self).focus();
+                                return;
+                            }
+                            $(self).removeAttr('contenteditable');
+                            $.post("{:url('pictureFolder/rename')}",{id:id,name:text}, function (res) {
+                                if(res){
+                                    $(self).text(res.data.name);
+                                    display_pictures_and_folders(folder_id);
+                                }else{
+                                    alert(res.info);
+                                }
+                            });
+                        });
+
+
+                        $img.attr({src: "__ASSETS__/images/folder.gif",alt:""});
+
+                        $checkbox.attr({name:"folder_ids",value:n.folder_id});
+
+                        $a.attr({href:"javascript:void(0);","data-folder-id": n.folder_id,title: n.name});
+                        $a.dblclick(function () {
+                            var folder_cache_obj = {id:n.folder_id,name:n.name};
+                            folder_path_cache_set(n.folder_id,folder_cache_obj);
+                            var folder_id = $(this).data('folder-id');
+                            display_pictures_and_folders(folder_id);
+                        });
+
+                        //绑定事件
+                        $a_remove.click(function () {
+                            var folder_id = $(this).data("id");
+                            if(confirm("是否要删除此项")){
+                                $.post("{:url('PictureFolder/drop')}",{id:folder_id}, function (res) {
+                                    if(res.status==1){
+                                        console.info('picture_folder_list_json',res.picture_folder_list_json);
+                                        treeManager.setData(res.picture_folder_list_json);
+                                        treeManager.refreshTree();
+                                        var folder_id = $("#up_group_buttons").data('folder-id');
+                                        display_pictures_and_folders(folder_id);
+                                    }else{
+                                        alert(res.info);
+                                    }
+                                });
+                            }
+                        });
+
+                        //
+                        $a_edit.attr({"data-id": n.folder_id}).click(function () {
+                            var id = $(this).data('id');
+                            $("#folderTreeDialog").find('.btn-submit-edit').data({"folder-ids":id,"picture-ids":""});
+                            $("#folderTreeDialog").modal('show');
+                        });
+                    }else{
+                        $name.css({"margin-top":-30});
+                        $container.addClass("file");
+                        $img.attr({"data-id": n.id});
+                        $checkbox.attr({name:"picture_ids",value:n.id})
+                        $a.addClass("img-item");
+                        $a_remove.attr({"data-id": n.id});
+                        //绑定事件
+                        $a_remove.click(function () {
+                            var pid = $(this).data("id");
+                            if(confirm("是否要删除此文件")){
+                                $.post("{:url('asset/picture/hide')}",{id:pid}, function (response) {
+                                    if(response.status==1){
+                                        var folder_id = $("#up_group_buttons").data('folder-id');
+                                        display_pictures_and_folders(folder_id);
+                                    }
+                                });
+                            }
+                        });
+
+                        //
+                        //
+                        $a_edit.attr({"data-id": n.id}).click(function () {
+                            var id = $(this).data('id');
+                            $("#folderTreeDialog").find('.btn-submit-edit').data({"folder-ids":"","picture-ids":id});
+                            $("#folderTreeDialog").modal('show');
+                        });
+                    }
+                    $a.prepend($img);
+                    /**
+                     * <div class="operate"><a class="glyphicon glyphicon-remove pull-right"></a></div>
+                     */
+                    $container.append($operate);
+
+                    $container.append($footer);
+
+                    $("#asset_picture_list").append($container);
+                });
+            }
+            /**
+             * 因为数据已更新，所以要重新检查是否可以批量移动图片
+             */
+            batch_move_check();
+        });
+    }
+
+    $(".btn-back-pull-files").click(function () {
+        var folder_id = $(this).data('folder-id');
+        var old_id = $(this).data('old-id');
+        display_pictures_and_folders(folder_id, function (response) {
+            folder_path_cache_remove(old_id);
+        });
+    });
+
+    /**
+     */
+    $('.modal-assets-dialog .close').click(function () {
+        $(this).closest('.modal').modal('hide');
+    });
+
+
+    /**
+     *
+     */
+    $("#newFolderDialog .submit-new-folder").click(function () {
+        var that = this;
+        var parent_id = $("#up_group_buttons").data("folder-id");
+//            alert(parent_id);
+//            return;
+        var name = $("#folder_name").val();
+        if($.trim(name)==""){
+            alert("请正确填写文件夹名称");
+            return;
+        }
+
+        $.post("{:url('PictureFolder/create')}",{parent_id:parent_id,name:name}, function (response) {
+            if(response.status==1){
+                console.info('picture_folder_list_json',response.picture_folder_list_json);
+                treeManager.setData(response.picture_folder_list_json);
+                treeManager.refreshTree();
+                display_pictures_and_folders(response.folder.parent_id);
+            }
+            $(that).closest('.modal').modal('hide');
+        });
+    });
+
+    $("#folderTreeDialog .btn-submit-edit").click(function () {
+        var that = this;
+        var folder_ids = $(this).data('folder-ids');
+        var picture_ids = $(this).data('picture-ids');
+
+        var node = treeManager.getSelected();
+
+        if(!node){
+            alert("请选择一个文件夹");
+            return;
+        }
+        var url = "{:url('Picture/move_to')}";
+
+        console.info('node',node);
+        var target_id = node.data.id
+        $.post(url,{target_id:target_id,folder_ids:folder_ids,picture_ids:picture_ids}, function (res) {
+            if(res.status==1){
+                treeManager.setData(res.picture_folder_list_json);
+                treeManager.refreshTree();
+                var folder_id = $("#up_group_buttons").data('folder-id');
+                display_pictures_and_folders(folder_id);
+            }
+            $(that).closest('.modal').modal('hide');
+        });
+    });
+
+
+
+    /**
+     * 批量移动
+     */
+    $(".btn-batch-move").click(function () {
+
+        var folder_ids_arr = [];
+        $("#asset_picture_list").find("input[type='checkbox'][name='folder_ids']:checked").each(function (i, n) {
+            folder_ids_arr.push($(this).val());
+        });
+
+        var picture_ids_arr = [];
+        $("#asset_picture_list").find("input[type='checkbox'][name='picture_ids']:checked").each(function (i, n) {
+            picture_ids_arr.push($(this).val());
+        });
+
+        if(folder_ids_arr.length<1 && picture_ids_arr.length<1){
+            alert("请至少选择一项");
+            return;
+        }
+
+        $("#folderTreeDialog").find('.btn-submit-edit').data({"folder-ids":folder_ids_arr.join(','),"picture-ids":picture_ids_arr.join(',')});
+        $("#folderTreeDialog").modal('show');
+    });
+
+    /**
+     *
+     */
+    $("#asset_picture_list").on('change',"input[type='checkbox']", function () {
+        batch_move_check();
+    });
+
+    var folder_id = $("#up_group_buttons").data('folder-id');
+    display_pictures_and_folders(folder_id);
+</script>
+
+
+<script type="text/javascript">
+    var croppicHeaderOptions = {
+        cropUrl: "{:url('asset/picture/crop_upload')}",
+        modal: true,
+        uploadData:{},
+        customUploadButtonId: 'cropContainerHeaderButton',
+        onUploadProgress: function (evt) {
+            if (evt.lengthComputable) {
+                var percentComplete = (evt.loaded / evt.total) * 100;
+                //Do something with upload progress
+                $("#up_progress").find(".progress>.progress-bar").css({width: percentComplete + "%"});
+                console.log(percentComplete);
+            }
+        },
+        onAfterImgUpload: function () {
+
+        },
+        onImgDrag: function () {
+            console.log('onImgDrag');
+        },
+        onImgZoom: function () {
+            console.log('onImgZoom');
+        },
+        onBeforeImgCrop: function () {
+            console.log('onBeforeImgCrop');
+            console.log('onBeforeImgUpload');
+            var folder_id = $("#up_group_buttons").data("folder-id");
+            this.options.uploadData['folder_id'] = folder_id;
+
+            console.log(this);
+
+        },
+        onAfterImgCrop: function (response) {
+            this.reset();
+            console.log('onAfterImgUpload');
+            var folder_id = $("#up_group_buttons").data("folder-id");
+            if (response.status == 1) {
+                display_pictures_and_folders(folder_id);
+            }
+        },
+        onSelect: function (e) {
+            console.log('onSelect');
+        }
+    };
+
+    var uploadCropPic = new Croppic('croppic', croppicHeaderOptions);
+</script>
+{/block}
